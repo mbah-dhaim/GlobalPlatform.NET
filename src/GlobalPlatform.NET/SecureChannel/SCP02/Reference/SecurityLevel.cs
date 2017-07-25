@@ -2,6 +2,7 @@
 {
     public enum SecurityLevel : byte
     {
+        NotAuthenticated,
         Authenticated = 0b00000000,
         CMac = 0b00000001,
         CDecryption = 0b00000011,

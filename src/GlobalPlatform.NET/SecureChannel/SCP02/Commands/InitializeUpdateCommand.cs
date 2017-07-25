@@ -1,9 +1,7 @@
-﻿using System;
-using GlobalPlatform.NET.Commands.Abstractions;
+﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
-using GlobalPlatform.NET.Cryptography;
 using GlobalPlatform.NET.Reference;
-using System.Collections.Generic;
+using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
 
 namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 {
@@ -41,7 +39,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 
         public IApduBuilder WithHostChallenge(out byte[] hostChallenge)
         {
-            this.hostChallenge = hostChallenge = SecureRandom.GetBytes(8);
+            this.hostChallenge = hostChallenge = Crypto.SecureRandom.GetBytes(8);
 
             return this;
         }

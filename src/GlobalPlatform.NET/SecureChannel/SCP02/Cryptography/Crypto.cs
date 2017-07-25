@@ -6,6 +6,21 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Cryptography
 {
     internal static class Crypto
     {
+        internal static class SecureRandom
+        {
+            public static byte[] GetBytes(int length)
+            {
+                var data = new byte[length];
+
+                using (var rng = RandomNumberGenerator.Create())
+                {
+                    rng.GetBytes(data);
+                }
+
+                return data;
+            }
+        }
+
         public static class TripleDes
         {
             /// <summary>
