@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using GlobalPlatform.NET.Commands.Interfaces;
+using System.Collections.Generic;
 using System.Linq;
-using GlobalPlatform.NET.Commands.Interfaces;
 
 namespace GlobalPlatform.NET.Commands.Abstractions
 {

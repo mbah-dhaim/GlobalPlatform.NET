@@ -2,7 +2,6 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Reference;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace GlobalPlatform.NET.Commands

@@ -1,5 +1,4 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;

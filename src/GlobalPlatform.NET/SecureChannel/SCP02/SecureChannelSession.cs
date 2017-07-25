@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GlobalPlatform.NET.SecureChannel.Interfaces;
+﻿using GlobalPlatform.NET.SecureChannel.Interfaces;
+using System;
 
 namespace GlobalPlatform.NET.SecureChannel.SCP02
 {

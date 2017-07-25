@@ -1,8 +1,8 @@
-﻿using System;
+﻿using GlobalPlatform.NET.Extensions;
+using GlobalPlatform.NET.Reference;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using GlobalPlatform.NET.Extensions;
-using GlobalPlatform.NET.Reference;
 
 namespace GlobalPlatform.NET
 {

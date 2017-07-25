@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using GlobalPlatform.NET.Commands.Abstractions;
+﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
