@@ -3,6 +3,7 @@ using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Reference;
 using System;
 using System.Linq;
+using GlobalPlatform.NET.Extensions;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -52,6 +53,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder WithTagList(params byte[] tagList)
         {
+            Ensure.IsNotNull(tagList, nameof(tagList));
+
             this.tagList = tagList;
 
             return this;

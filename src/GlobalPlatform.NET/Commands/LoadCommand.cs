@@ -1,4 +1,5 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
@@ -80,6 +81,11 @@ namespace GlobalPlatform.NET.Commands
 
         public IMultiApduBuilder WithBlockSize(byte blockSize)
         {
+            if (blockSize < 1)
+            {
+                throw new ArgumentException("Block size must be at least 1.", nameof(blockSize));
+            }
+
             this.blockSize = blockSize;
 
             return this;
@@ -87,6 +93,9 @@ namespace GlobalPlatform.NET.Commands
 
         public ILoadFileStructureBuilder WithDapBlock(byte[] securityDomainAID, byte[] signature)
         {
+            Ensure.IsAID(securityDomainAID, nameof(securityDomainAID));
+            Ensure.IsNotNullOrEmpty(signature, nameof(signature));
+
             this.securityDomainAID = securityDomainAID;
             this.signature = signature;
 
@@ -95,6 +104,8 @@ namespace GlobalPlatform.NET.Commands
 
         public ILoadCommandBlockSizePicker Load(byte[] data)
         {
+            Ensure.IsNotNullOrEmpty(data, nameof(data));
+
             this.data = data;
 
             return this;

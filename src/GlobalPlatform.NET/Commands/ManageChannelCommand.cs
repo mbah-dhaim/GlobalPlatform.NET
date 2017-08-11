@@ -43,6 +43,11 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder WithIdentifier(byte identifier)
         {
+            if (identifier > 19)
+            {
+                throw new ArgumentException("Identifier must be between 0-19 (inclusive).", nameof(identifier));
+            }
+
             this.identifier = identifier;
 
             return this;

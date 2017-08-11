@@ -1,5 +1,6 @@
 ﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
+using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
 
@@ -36,6 +37,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 
         public IApduBuilder UsingHostCryptogram(byte[] hostCryptogram)
         {
+            Ensure.HasCount(hostCryptogram, nameof(hostCryptogram), 8);
+
             this.hostCryptogram = hostCryptogram;
 
             return this;

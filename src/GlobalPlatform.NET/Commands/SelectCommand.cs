@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Reference;
 using System;
+using GlobalPlatform.NET.Extensions;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -55,10 +56,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder Of(byte[] application)
         {
-            if (application.Length < 5 || application.Length > 16)
-            {
-                throw new ArgumentException("Length must be between 5-16 bytes (inclusive).", nameof(application));
-            }
+            Ensure.IsAID(application, nameof(application));
 
             this.application = application;
 

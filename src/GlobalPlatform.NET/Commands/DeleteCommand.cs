@@ -93,10 +93,7 @@ namespace GlobalPlatform.NET.Commands
         /// <returns></returns>
         public IDeleteCommandOptionsPicker WithAID(byte[] aid)
         {
-            if (aid.Length < 5 || aid.Length > 16)
-            {
-                throw new ArgumentException("Length must be between 5-16 bytes (inclusive).", nameof(aid));
-            }
+            Ensure.IsAID(aid, nameof(aid));
 
             this.application = aid;
 
@@ -112,10 +109,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder UsingToken(byte[] token)
         {
-            if (!token.Any())
-            {
-                throw new ArgumentException("Length must be at least 1.", nameof(token));
-            }
+            Ensure.HasAtLeast(token, nameof(token), 1);
 
             this.token = token;
 

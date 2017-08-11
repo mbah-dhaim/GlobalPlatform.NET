@@ -3,6 +3,7 @@ using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -79,6 +80,11 @@ namespace GlobalPlatform.NET.Commands
 
         public IPutKeyIdentifierPicker WithKeyVersion(byte keyVersion)
         {
+            if (keyVersion < 1 || keyVersion > 0x7F)
+            {
+                throw new ArgumentException("Version number must be between 1-7F (inclusive).", nameof(keyVersion));
+            }
+
             this.keyVersion = keyVersion;
 
             return this;
@@ -86,6 +92,11 @@ namespace GlobalPlatform.NET.Commands
 
         public IPutKeyEncryptionKeyPicker WithKeyIdentifier(byte keyIdentifier)
         {
+            if (keyIdentifier < 1 || keyIdentifier > 0x7F)
+            {
+                throw new ArgumentException("Identifier must be between 1-7F (inclusive).", nameof(keyIdentifier));
+            }
+
             this.keyIdentifier = keyIdentifier;
 
             return this;
@@ -93,6 +104,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IPutKeyFirstKeyPicker UsingEncryptionKey(byte[] encryptionKey)
         {
+            Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
+
             this.encryptionKey = encryptionKey;
 
             return this;
@@ -100,6 +113,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IPutKeySecondKeyPicker PutFirstKey(KeyTypeCoding keyType, byte[] key)
         {
+            Ensure.HasCount(key, nameof(key), 16);
+
             this.key1 = (keyType, key);
 
             return this;
@@ -107,6 +122,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IPutKeyThirdKeyPicker PutSecondKey(KeyTypeCoding keyType, byte[] key)
         {
+            Ensure.HasCount(key, nameof(key), 16);
+
             this.key2 = (keyType, key);
 
             return this;
@@ -114,6 +131,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder PutThirdKey(KeyTypeCoding keyType, byte[] key)
         {
+            Ensure.HasCount(key, nameof(key), 16);
+
             this.key3 = (keyType, key);
 
             return this;

@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -60,6 +61,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IStoreDataBlockSizePicker StoreData(byte[] data)
         {
+            Ensure.IsNotNullOrEmpty(data, nameof(data));
+
             this.data = data;
 
             return this;
@@ -67,6 +70,11 @@ namespace GlobalPlatform.NET.Commands
 
         public IMultiApduBuilder WithBlockSize(byte blockSize)
         {
+            if (blockSize < 1)
+            {
+                throw new ArgumentException("Block size must be at least 1.", nameof(blockSize));
+            }
+
             this.blockSize = blockSize;
 
             return this;

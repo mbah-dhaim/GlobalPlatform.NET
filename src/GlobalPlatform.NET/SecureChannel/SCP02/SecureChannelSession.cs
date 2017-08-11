@@ -183,6 +183,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public IScp02MacKeyPicker UsingEncryptionKey(byte[] encryptionKey)
         {
+            Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
+
             this.encryptionKey = encryptionKey;
 
             return this;
@@ -190,6 +192,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public IScp02DataEncryptionKeyPicker UsingMacKey(byte[] macKey)
         {
+            Ensure.HasCount(macKey, nameof(macKey), 16);
+
             this.macKey = macKey;
 
             return this;
@@ -197,6 +201,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public IScp02HostChallengePicker UsingDataEncryptionKey(byte[] dataEncryptionKey)
         {
+            Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
+
             this.dataEncryptionKey = dataEncryptionKey;
 
             return this;
@@ -204,6 +210,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public IScp02InitializeUpdateResponsePicker UsingHostChallenge(byte[] hostChallenge)
         {
+            Ensure.HasCount(hostChallenge, nameof(hostChallenge), 8);
+
             this.hostChallenge = hostChallenge;
 
             return this;
@@ -211,6 +219,13 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse)
         {
+            Ensure.HasCount(initializeUpdateResponse, nameof(initializeUpdateResponse), 30);
+
+            if (!initializeUpdateResponse.TakeLast(2).SequenceEqual(new byte[] { 0x90, 0x00 }))
+            {
+                throw new ArgumentException("INITIALIZE UPDATE response status bytes do not indicate success.", nameof(initializeUpdateResponse));
+            }
+
             this.initializeUpdateResponse = initializeUpdateResponse;
 
             return this;

@@ -50,6 +50,8 @@ namespace GlobalPlatform.NET.Commands
 
         public IApduBuilder WithFilter(byte[] applicationFilter)
         {
+            Ensure.IsNotNull(applicationFilter, nameof(applicationFilter));
+
             this.applicationFilter = applicationFilter;
 
             return this;

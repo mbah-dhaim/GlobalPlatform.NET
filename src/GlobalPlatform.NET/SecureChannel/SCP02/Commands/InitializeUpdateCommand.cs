@@ -1,5 +1,7 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
+using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
 
@@ -34,6 +36,11 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 
         public IInitializeUpdateHostChallengePicker WithKeyVersion(byte version)
         {
+            if (version < 1 || version > 0x7F)
+            {
+                throw new ArgumentException("Version number must be between 1-7F (inclusive).", nameof(version));
+            }
+
             this.P1 = version;
 
             return this;
@@ -41,6 +48,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 
         public IApduBuilder WithHostChallenge(byte[] hostChallenge)
         {
+            Ensure.HasCount(hostChallenge, nameof(hostChallenge), 8);
+
             this.hostChallenge = hostChallenge;
 
             return this;
