@@ -21,7 +21,7 @@ namespace GlobalPlatform.NET.Commands
 
     public interface IPutKeyEncryptionKeyPicker
     {
-        IPutKeyFirstKeyPicker UsingKEK(byte[] kek);
+        IPutKeyFirstKeyPicker UsingEncryptionKey(byte[] encryptionKey);
     }
 
     public interface IPutKeyFirstKeyPicker
@@ -49,10 +49,10 @@ namespace GlobalPlatform.NET.Commands
     {
         private byte keyVersion;
         private byte keyIdentifier;
+        private byte[] encryptionKey;
         private (KeyTypeCoding KeyType, byte[] Value) key1;
         private (KeyTypeCoding KeyType, byte[] Value) key2;
         private (KeyTypeCoding KeyType, byte[] Value) key3;
-        private byte[] kek;
 
         public IPutKeyIdentifierPicker WithKeyVersion(byte keyVersion)
         {
@@ -68,9 +68,9 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public IPutKeyFirstKeyPicker UsingKEK(byte[] kek)
+        public IPutKeyFirstKeyPicker UsingEncryptionKey(byte[] encryptionKey)
         {
-            this.kek = kek;
+            this.encryptionKey = encryptionKey;
 
             return this;
         }
@@ -103,20 +103,20 @@ namespace GlobalPlatform.NET.Commands
             var data = new List<byte> { this.keyVersion };
 
             data.Add((byte)this.key1.KeyType);
-            data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key1.Value, this.kek, CipherMode.ECB));
+            data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key1.Value, this.encryptionKey, CipherMode.ECB));
             data.Add(0x00);
 
             if (this.key2.Value.Any())
             {
                 data.Add((byte)this.key2.KeyType);
-                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key2.Value, this.kek, CipherMode.ECB));
+                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key2.Value, this.encryptionKey, CipherMode.ECB));
                 data.Add(0x00);
             }
 
             if (this.key3.Value.Any())
             {
                 data.Add((byte)this.key3.KeyType);
-                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key3.Value, this.kek, CipherMode.ECB));
+                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key3.Value, this.encryptionKey, CipherMode.ECB));
                 data.Add(0x00);
             }
 
