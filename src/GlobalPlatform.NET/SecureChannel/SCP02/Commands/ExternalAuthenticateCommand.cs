@@ -7,45 +7,31 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 {
     public interface ISecurityLevelPicker
     {
-        IHostChallengePicker WithSecurityLevel(SecurityLevel securityLevel);
+        IHostCryptogramPicker WithSecurityLevel(SecurityLevel securityLevel);
     }
 
-    public interface IHostChallengePicker
+    public interface IHostCryptogramPicker
     {
-        ISecureChannelKeyPicker UsingHostChallenge(byte[] hostChallenge);
-    }
-
-    public interface ISecureChannelKeyPicker
-    {
-        IApduBuilder AndKey(byte[] key);
+        IApduBuilder UsingHostCryptogram(byte[] hostCryptogram);
     }
 
     public class ExternalAuthenticateCommand : CommandBase<ExternalAuthenticateCommand, ISecurityLevelPicker>,
         ISecurityLevelPicker,
-        IHostChallengePicker,
-        ISecureChannelKeyPicker
+        IHostCryptogramPicker
     {
-        private byte[] hostChallenge;
         private byte[] key;
         private byte[] hostCryptogram;
 
-        public IHostChallengePicker WithSecurityLevel(SecurityLevel securityLevel)
+        public IHostCryptogramPicker WithSecurityLevel(SecurityLevel securityLevel)
         {
             this.P1 = (byte)securityLevel;
 
             return this;
         }
 
-        public ISecureChannelKeyPicker UsingHostChallenge(byte[] hostChallenge)
+        public IApduBuilder UsingHostCryptogram(byte[] hostCryptogram)
         {
-            this.hostChallenge = hostChallenge;
-
-            return this;
-        }
-
-        public IApduBuilder AndKey(byte[] key)
-        {
-            this.key = key;
+            this.hostCryptogram = hostCryptogram;
 
             return this;
         }

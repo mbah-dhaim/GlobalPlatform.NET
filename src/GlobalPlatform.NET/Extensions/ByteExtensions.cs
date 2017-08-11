@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Extensions
 {
@@ -45,5 +46,19 @@ namespace GlobalPlatform.NET.Extensions
         /// <param name="array"></param>
         /// <returns></returns>
         public static byte LengthChecked(this byte[] array) => checked((byte)array.Length);
+
+        /// <summary>
+        /// Pads a byte array using ISO/IEC 7816-4. 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public static ICollection<byte> Pad(this ICollection<byte> bytes)
+        {
+            bytes.Add(0x80);
+
+            bytes.AddRange(Enumerable.Repeat<byte>(0x00, 8 - bytes.Count % 8));
+
+            return bytes;
+        }
     }
 }
