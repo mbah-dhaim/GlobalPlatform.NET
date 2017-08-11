@@ -14,18 +14,6 @@ namespace GlobalPlatform.NET.Extensions
             }
         }
 
-        public static void ForEach<TSource>(this IEnumerable<TSource> source, Action<TSource, int> action)
-        {
-            int index = 0;
-
-            foreach (var item in source)
-            {
-                action(item, index);
-
-                index++;
-            }
-        }
-
         public static void ForEach<TSource>(this ICollection<TSource> collection, Action<TSource, int, bool> action)
         {
             int index = 0;
