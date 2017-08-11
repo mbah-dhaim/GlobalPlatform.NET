@@ -70,11 +70,11 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public SecurityLevel SecurityLevel { get; private set; }
 
-        public byte[] CMac { get; private set; }
+        public byte[] CMac { get; private set; } = new byte[8];
 
         public byte[] CMacKey { get; private set; }
 
-        public byte[] RMac { get; private set; }
+        public byte[] RMac { get; private set; } = new byte[8];
 
         public byte[] RMacKey { get; private set; }
 
@@ -158,7 +158,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
             apduData.AddRange(apdu.CommandData);
 
-            byte[] padded = apduData.ToArray().Pad().ToArray();
+            byte[] padded = apduData.Pad().ToArray();
 
             return padded;
         }

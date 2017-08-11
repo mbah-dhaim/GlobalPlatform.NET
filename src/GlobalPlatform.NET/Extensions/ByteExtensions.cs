@@ -52,7 +52,7 @@ namespace GlobalPlatform.NET.Extensions
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        public static ICollection<byte> Pad(this ICollection<byte> bytes)
+        public static IList<byte> Pad(this IList<byte> bytes)
         {
             bytes.Add(0x80);
 
