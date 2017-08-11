@@ -65,5 +65,19 @@ namespace GlobalPlatform.NET.Tests
             apdu.CommandData.Should().BeEquivalentTo(hostChallenge);
             apdu.Le.First().Should().Be(0x00);
         }
+
+        [TestMethod]
+        public void ExternalAuthenticate()
+        {
+            const SecurityLevel securityLevel = SecurityLevel.CDecryptionCMacRMac;
+            byte[] hostCryptogram = new byte[8];
+
+            var apdu = ExternalAuthenticateCommand.Build
+                .WithSecurityLevel(securityLevel)
+                .UsingHostCryptogram(hostCryptogram)
+                .AsApdu();
+
+            apdu.Buffer.ShouldBeEquivalentTo(new byte[] { 0x80, 0x82, (byte)securityLevel, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 });
+        }
     }
 }
