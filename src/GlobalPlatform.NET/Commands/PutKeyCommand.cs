@@ -39,6 +39,29 @@ namespace GlobalPlatform.NET.Commands
         IApduBuilder PutThirdKey(KeyTypeCoding keyType, byte[] key);
     }
 
+    /// <summary>
+    /// The PUT KEY command is used to either: 
+    /// <para>
+    /// Replace an existing key with a new key: The new key has the same or a different Key Version
+    /// Number but the same Key Identifier as the key being replaced;
+    /// </para>
+    /// <para>
+    /// Replace multiple existing keys with new keys: The new keys have the same or a different Key
+    /// Version Number (identical for all new keys) but the same Key Identifiers as the keys being replaced;
+    /// </para>
+    /// <para>
+    /// Add a single new key: The new key has a different combination Key Identifier / Key Version
+    /// Number than that of the existing keys;
+    /// </para>
+    /// <para>
+    /// Add multiple new keys: The new keys have different combinations of Key Identifiers / Key
+    /// Version Number (identical to all new keys) than that of the existing keys;
+    /// </para>
+    /// <para>
+    /// When the key management operation requires multiple PUT KEY commands, chaining of the
+    /// multiple PUT KEY commands is recommended to ensure integrity of the operation.
+    /// </para>
+    /// </summary>
     public class PutKeyCommand : CommandBase<PutKeyCommand, IPutKeyVersionPicker>,
         IPutKeyVersionPicker,
         IPutKeyIdentifierPicker,

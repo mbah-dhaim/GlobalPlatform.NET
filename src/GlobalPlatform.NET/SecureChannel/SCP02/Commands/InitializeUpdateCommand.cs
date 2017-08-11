@@ -17,6 +17,15 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
         IApduBuilder WithHostChallenge(out byte[] hostChallenge);
     }
 
+    /// <summary>
+    /// The INITIALIZE UPDATE command is used, during explicit initiation of a Secure Channel, to
+    /// transmit card and session data between the card and the host. This command initiates the
+    /// initiation of a Secure Channel Session.
+    /// <para>
+    /// At any time during a current Secure Channel, the INITIALIZE UPDATE command can be issued to
+    /// the card in order to initiate a new Secure Channel Session.
+    /// </para>
+    /// </summary>
     public class InitializeUpdateCommand : CommandBase<InitializeUpdateCommand, IInitializeUpdateKeyVersionPicker>,
         IInitializeUpdateKeyVersionPicker,
         IInitializeUpdateHostChallengePicker
