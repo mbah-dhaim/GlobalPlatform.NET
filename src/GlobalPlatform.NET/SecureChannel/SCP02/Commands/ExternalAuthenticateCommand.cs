@@ -19,7 +19,6 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
         ISecurityLevelPicker,
         IHostCryptogramPicker
     {
-        private byte[] key;
         private byte[] hostCryptogram;
 
         public IHostCryptogramPicker WithSecurityLevel(SecurityLevel securityLevel)
