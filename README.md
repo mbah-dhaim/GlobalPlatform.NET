@@ -13,21 +13,24 @@ Every command can be built by calling the `Build` method on the command object; 
 
 ```csharp
 SelectCommand.Build
-  .SelectNextOccurrence()
-  .Of(application)
+  .SelectFirstOrOnlyOccurrence()
+  .Of(aid)
+  
+-> 00-A4-04-00-08-FF-FF-FF-FF-FF-FF-FF-FF-00
                 
 DeleteCommand.Build
   .DeleteCardContent()
   .WithAID(aid)
   .AndRelatedObjects()
   .UsingToken(token)
+
+-> 80-E4-00-80-14-4F-08-FF-FF-FF-FF-FF-FF-FF-FF-9E-08-EE-EE-EE-EE-EE-EE-EE-EE-00
   
-PutKeyCommand.Build
-  .WithKeyVersion(1)
-  .UsingKEK(encryptionkey)
-  .PutFirstKey(KeyTypeCoding.DES, key1)
-  .PutSecondKey(KeyTypeCoding.DES, key2)
-  .PutThirdKey(KeyTypeCoding.DES, key3)
+SetStatusCommand.Build
+  .SetIssuerSecurityDomainStatus()
+  .To(CardLifeCycleCoding.Initialized)
+
+-> 80-F0-80-07
 ```
 
 ## Secure Channels
