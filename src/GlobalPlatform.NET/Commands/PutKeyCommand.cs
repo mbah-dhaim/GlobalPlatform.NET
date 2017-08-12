@@ -2,11 +2,11 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -145,20 +145,20 @@ namespace GlobalPlatform.NET.Commands
             var data = new List<byte> { this.keyVersion };
 
             data.Add((byte)this.key1.KeyType);
-            data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key1.Value, this.encryptionKey, CipherMode.ECB));
+            data.AddRangeWithLength(TripleDES.Encrypt(this.key1.Value, this.encryptionKey, CipherMode.ECB));
             data.Add(0x00);
 
             if (this.key2.Value.Any())
             {
                 data.Add((byte)this.key2.KeyType);
-                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key2.Value, this.encryptionKey, CipherMode.ECB));
+                data.AddRangeWithLength(TripleDES.Encrypt(this.key2.Value, this.encryptionKey, CipherMode.ECB));
                 data.Add(0x00);
             }
 
             if (this.key3.Value.Any())
             {
                 data.Add((byte)this.key3.KeyType);
-                data.AddRangeWithLength(Crypto.TripleDes.Encrypt(this.key3.Value, this.encryptionKey, CipherMode.ECB));
+                data.AddRangeWithLength(TripleDES.Encrypt(this.key3.Value, this.encryptionKey, CipherMode.ECB));
                 data.Add(0x00);
             }
 

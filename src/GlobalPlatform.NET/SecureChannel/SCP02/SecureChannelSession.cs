@@ -7,6 +7,8 @@ using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
+using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.SecureChannel.SCP02
 {
@@ -89,6 +91,11 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             .UsingHostCryptogram(this.HostCryptogram)
             .AsApdu();
 
+        /// <summary>
+        /// Based on section E.1.5 of the v2.3 GlobalPlatform Card Specification. 
+        /// </summary>
+        /// <param name="apdu"></param>
+        /// <returns></returns>
         public Apdu SecureApdu(Apdu apdu)
         {
             if (apdu.CLA != ApduClass.GlobalPlatform)
@@ -101,6 +108,17 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 return ((byte)this.SecurityLevel & mask) == mask;
             }
 
+            // If bit 1 is set, the current security level requires the use of command encryption.
+            if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
+            {
+                byte[] paddedCommandData = apdu.CommandData.ToList().Pad().ToArray();
+
+                byte[] encrypted = TripleDES.Encrypt(paddedCommandData, this.EncryptionKey);
+
+                apdu.CommandData = encrypted;
+            }
+
+            // If bit 0 is set, the current security level requires the use of a C-MAC.
             if (CheckSecurityLevelOption(0b00000001) || apdu.INS == ApduInstruction.ExternalAuthenticate)
             {
                 apdu.CLA = ApduClass.SecureMessaging;
@@ -116,30 +134,14 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 this.CMac = mac;
             }
 
-            if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
-            {
-                byte[] commandData = apdu.CommandData.Take(apdu.CommandData.Length - 8).ToArray();
-                byte[] mac = apdu.CommandData.TakeLast(8).ToArray();
-
-                byte[] paddedCommandData = commandData.Pad().ToArray();
-
-                byte[] enc = Crypto.TripleDes.Encrypt(paddedCommandData, this.EncryptionKey);
-
-                var data = new List<byte>();
-                data.AddRange(enc);
-                data.AddRange(mac);
-
-                apdu.CommandData = data.ToArray();
-            }
-
             return apdu;
         }
 
         private byte[] GenerateCmac(Apdu apdu)
         {
-            byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : Crypto.Des.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
+            byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : DES.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
 
-            byte[] mac = Crypto.Mac.SingleDesPlusFinalTripleDes(GetDataForCmac(apdu), this.CMacKey, icv);
+            byte[] mac = MAC.Algorithm3(GetDataForCmac(apdu), this.CMacKey, icv);
 
             return mac;
         }
@@ -262,14 +264,14 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         }
 
         internal byte[] GenerateSessionKey(SessionKeyType sessionKeyType, byte[] staticKey)
-            => Crypto.TripleDes.Encrypt(this.GenerateDerivationData(sessionKeyType), staticKey);
+            => TripleDES.Encrypt(this.GenerateDerivationData(sessionKeyType), staticKey);
 
         internal void VerifyCardCryptogram()
         {
-            var actual = this.CardCryptogram;
+            var fromCard = this.CardCryptogram;
             var generated = this.GenerateCryptogram(CryptogramType.Card);
 
-            if (!actual.SequenceEqual(generated))
+            if (!fromCard.SequenceEqual(generated))
             {
                 throw new Exception("Card cryptogram could not be verified.");
             }
@@ -302,7 +304,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
             data.Pad();
 
-            byte[] cryptogram = Crypto.Mac.FullTripleDes(data.ToArray(), this.EncryptionKey);
+            byte[] cryptogram = MAC.Algorithm1(data.ToArray(), this.EncryptionKey);
 
             return cryptogram;
         }
