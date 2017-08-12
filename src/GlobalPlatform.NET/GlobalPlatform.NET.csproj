@@ -2,8 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
-    <Version>0.9.0-pre</Version>
+    <Version>1.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Company>James Harling</Company>
+    <Authors>James Harling</Authors>
+    <Description>A fluent .NET API to manage GlobalPlatform smartcards.</Description>
+    <Copyright>James Harling</Copyright>
+    <PackageLicenseUrl>https://github.com/jamesharling/GlobalPlatform.NET/blob/develop/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jamesharling/GlobalPlatform.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jamesharling/GlobalPlatform.NET</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>smartcard globalplatform global platform jcop javacard fluent</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
