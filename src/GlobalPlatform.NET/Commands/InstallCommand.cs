@@ -535,7 +535,7 @@ namespace GlobalPlatform.NET.Commands
                     return this.BuildForPersonalization();
 
                 default:
-                    throw new InvalidOperationException("The current value of P1 suggests multiple commands are to be generated.");
+                    throw new InvalidOperationException("The current value of P1 suggests multiple commands must be generated.");
             }
         }
 
