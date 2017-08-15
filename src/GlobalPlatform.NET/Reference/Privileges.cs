@@ -1,6 +1,5 @@
 ﻿using GlobalPlatform.NET.Extensions;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace GlobalPlatform.NET.Reference
 {
@@ -66,12 +65,9 @@ namespace GlobalPlatform.NET.Reference
                 this.byte1
             };
 
-            if (this.byte2 > 0)
+            if (this.byte2 > 0 || this.byte3 > 0)
             {
                 bytes.Add(this.byte2);
-            }
-            if (this.byte3 > 0)
-            {
                 bytes.Add(this.byte3);
             }
 
