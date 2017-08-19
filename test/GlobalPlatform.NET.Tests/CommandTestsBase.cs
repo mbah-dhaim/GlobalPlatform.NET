@@ -10,10 +10,12 @@ namespace GlobalPlatform.NET.Tests
     {
         protected static readonly byte[] ExecutableLoadFileAID = Enumerable.Repeat<byte>(0xAA, 8).ToArray();
         protected static readonly byte[] ExecutableModuleAID = Enumerable.Repeat<byte>(0xBB, 8).ToArray();
+        protected static readonly byte[] SecurityDomainAID = Enumerable.Repeat<byte>(0xEE, 8).ToArray();
         protected static readonly byte[] ApplicationAID = Enumerable.Repeat<byte>(0xFF, 8).ToArray();
-        protected static readonly byte[] Token = Enumerable.Repeat<byte>(0xEE, 4).ToArray();
         protected static readonly byte[] Token = Enumerable.Repeat<byte>(0x11, 4).ToArray();
+        protected static readonly byte[] Hash = Enumerable.Repeat<byte>(0x22, 4).ToArray();
         protected static readonly byte[] KeyData = Enumerable.Range(64, 16).Select(x => (byte)x).ToArray();
+        protected static readonly byte[] InstallParameters = { 0xC9, 0x00 };
     }
 
     public static class ApduExtensions
