@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace GlobalPlatform.NET
 {
+    [Serializable]
     public class Apdu
     {
         public byte[] Buffer

@@ -47,6 +47,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);
     }
 
+    [Serializable]
     public class SecureChannelSession : IScp02SecureChannelSession,
         IScp02SessionBuilder,
         IScp02SecurityLevelPicker,
