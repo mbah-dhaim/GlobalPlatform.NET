@@ -87,11 +87,6 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public byte[] HostCryptogram { get; private set; }
 
-        public Apdu ExternalAuthenticateCommand => Commands.ExternalAuthenticateCommand.Build
-            .WithSecurityLevel(this.SecurityLevel)
-            .UsingHostCryptogram(this.HostCryptogram)
-            .AsApdu();
-
         /// <summary>
         /// Based on section E.1.5 of the v2.3 GlobalPlatform Card Specification. 
         /// </summary>
@@ -109,16 +104,6 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 return ((byte)this.SecurityLevel & mask) == mask;
             }
 
-            // If bit 1 is set, the current security level requires the use of command encryption.
-            if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
-            {
-                byte[] paddedCommandData = apdu.CommandData.ToList().Pad().ToArray();
-
-                byte[] encrypted = TripleDES.Encrypt(paddedCommandData, this.EncryptionKey);
-
-                apdu.CommandData = encrypted;
-            }
-
             // If bit 0 is set, the current security level requires the use of a C-MAC.
             if (CheckSecurityLevelOption(0b00000001) || apdu.INS == ApduInstruction.ExternalAuthenticate)
             {
@@ -131,20 +116,37 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 data.AddRange(mac);
 
                 apdu.CommandData = data.ToArray();
+            }
 
-                this.CMac = mac;
+            // If bit 1 is set, the current security level requires the use of command encryption.
+            if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
+            {
+                byte[] commandData = apdu.CommandData.Take(apdu.CommandData.Length - 8).ToArray();
+                byte[] mac = apdu.CommandData.TakeLast(8).ToArray();
+
+                byte[] padded = commandData.ToList().Pad().ToArray();
+
+                byte[] encrypted = TripleDES.Encrypt(padded, this.EncryptionKey);
+
+                var data = new List<byte>();
+                data.AddRange(encrypted);
+                data.AddRange(mac);
+
+                apdu.CommandData = data.ToArray();
             }
 
             return apdu;
         }
 
-        private byte[] GenerateCmac(Apdu apdu)
+        internal byte[] GenerateCmac(Apdu apdu)
         {
             byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : DES.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
 
-            byte[] mac = MAC.Algorithm3(GetDataForCmac(apdu), this.CMacKey, icv);
+            var data = GetDataForCmac(apdu);
 
-            return mac;
+            byte[] mac = MAC.Algorithm3(data, this.CMacKey, icv);
+
+            return this.CMac = mac;
         }
 
         /// <summary>
@@ -155,10 +157,13 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         /// </summary>
         /// <param name="apdu"></param>
         /// <returns></returns>
-        private static byte[] GetDataForCmac(Apdu apdu)
+        internal static byte[] GetDataForCmac(Apdu apdu)
         {
-            var apduData = new List<byte> { (byte)apdu.CLA, (byte)apdu.INS, apdu.P1, apdu.P2, apdu.Lc };
+            var apduData = new List<byte> { (byte)apdu.CLA, (byte)apdu.INS, apdu.P1, apdu.P2 };
 
+            byte newLc = checked((byte)(apdu.Lc + 8));
+
+            apduData.Add(newLc);
             apduData.AddRange(apdu.CommandData);
 
             byte[] padded = apduData.Pad().ToArray();
@@ -167,7 +172,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         }
 
         public IEnumerable<Apdu> SecureApdu(params Apdu[] apdus)
-            => apdus.Select(apdu => this.SecureApdu(apdu));
+            => apdus.Select(this.SecureApdu);
 
         public IEnumerable<Apdu> SecureApdu(IEnumerable<Apdu> apdus)
             => this.SecureApdu(apdus.ToArray());

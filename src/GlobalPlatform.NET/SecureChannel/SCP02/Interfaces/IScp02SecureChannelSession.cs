@@ -47,14 +47,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Interfaces
 
         /// <summary>
         /// The host cryptogram that should be sent to the card using a subsequent EXTERNAL
-        /// AUTHENTICATE command
+        /// AUTHENTICATE command.
         /// </summary>
-        /// .
         byte[] HostCryptogram { get; }
-
-        /// <summary>
-        /// Returns the EXTERNAL AUTHENTICATE command needed to complete explicit authentication. 
-        /// </summary>
-        Apdu ExternalAuthenticateCommand { get; }
     }
 }
