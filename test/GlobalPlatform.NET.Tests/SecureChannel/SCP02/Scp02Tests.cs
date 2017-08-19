@@ -2,59 +2,14 @@
 using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel;
-using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
-namespace GlobalPlatform.NET.Tests
+namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
 {
     [TestClass]
-    public class SecureChannelTests
+    public class Scp02Tests
     {
-        [TestMethod]
-        public void InitializeUpdate()
-        {
-            const byte keyVersion = 0x01;
-            byte[] hostChallenge;
-
-            var apdu = InitializeUpdateCommand.Build
-                .WithKeyVersion(keyVersion)
-                .WithHostChallenge(out hostChallenge)
-                .AsApdu();
-
-            apdu.Buffer.Take(4).Should().BeEquivalentTo(new byte[] { 0x80, 0x50, keyVersion, 0x00 });
-            apdu.Lc.Should().Be(0x08);
-            apdu.CommandData.Should().BeEquivalentTo(hostChallenge);
-            apdu.Le.First().Should().Be(0x00);
-
-            hostChallenge = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-
-            apdu = InitializeUpdateCommand.Build
-                .WithKeyVersion(keyVersion)
-                .WithHostChallenge(hostChallenge)
-                .AsApdu();
-
-            apdu.Buffer.Take(4).Should().BeEquivalentTo(new byte[] { 0x80, 0x50, keyVersion, 0x00 });
-            apdu.Lc.Should().Be(0x08);
-            apdu.CommandData.Should().BeEquivalentTo(hostChallenge);
-            apdu.Le.First().Should().Be(0x00);
-        }
-
-        [TestMethod]
-        public void ExternalAuthenticate()
-        {
-            const SecurityLevel securityLevel = SecurityLevel.CDecryptionCMacRMac;
-            byte[] hostCryptogram = new byte[8];
-
-            var apdu = ExternalAuthenticateCommand.Build
-                .WithSecurityLevel(securityLevel)
-                .UsingHostCryptogram(hostCryptogram)
-                .AsApdu();
-
-            apdu.Buffer.ShouldBeEquivalentTo(new byte[] { 0x80, 0x82, (byte)securityLevel, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 });
-        }
-
         [TestMethod]
         public void SecureChannel_Scp02_Option15_Establish_Session()
         {
