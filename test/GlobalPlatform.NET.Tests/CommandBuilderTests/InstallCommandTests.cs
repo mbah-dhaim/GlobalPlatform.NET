@@ -213,8 +213,11 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .Personalize(ApplicationAID)
                 .AsApdu();
 
-            var commandData = new List<byte>();
+            var commandData = new List<byte> { 0x00, 0x00 };
             commandData.AddRangeWithLength(ApplicationAID);
+            commandData.Add(0x00);
+            commandData.Add(0x00);
+            commandData.Add(0x00);
 
             apdu.Assert(ApduInstruction.Install, 0x20, 0x00, commandData.ToArray());
         }

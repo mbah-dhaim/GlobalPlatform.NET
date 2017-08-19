@@ -650,9 +650,12 @@ namespace GlobalPlatform.NET.Commands
 
         private Apdu BuildForPersonalization()
         {
-            var commandData = new List<byte>();
+            var commandData = new List<byte> { 0x00, 0x00 };
 
             commandData.AddRangeWithLength(this.forPersonalizationApplicationAID);
+            commandData.Add(0x00);
+            commandData.Add(0x00);
+            commandData.Add(0x00);
 
             return this.Build(forPersonalization, commandData);
         }
