@@ -9,6 +9,8 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 {
     public interface IInitializeUpdateKeyVersionPicker
     {
+        IInitializeUpdateHostChallengePicker WithEngineeringKeys();
+
         IInitializeUpdateHostChallengePicker WithKeyVersion(byte version);
     }
 
@@ -33,6 +35,13 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
         IInitializeUpdateHostChallengePicker
     {
         private byte[] hostChallenge;
+
+        public IInitializeUpdateHostChallengePicker WithEngineeringKeys()
+        {
+            this.P1 = 0x00;
+
+            return this;
+        }
 
         public IInitializeUpdateHostChallengePicker WithKeyVersion(byte version)
         {
