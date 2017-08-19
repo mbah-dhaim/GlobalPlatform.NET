@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>1.1.1</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
+    <Company>James Harling</Company>
+    <Authors>James Harling</Authors>
+    <Description>A fluent .NET API to manage GlobalPlatform smartcards.</Description>
+    <Copyright>James Harling</Copyright>
+    <PackageLicenseUrl>https://github.com/jamesharling/GlobalPlatform.NET/blob/develop/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jamesharling/GlobalPlatform.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jamesharling/GlobalPlatform.NET</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>smartcard globalplatform global platform jcop javacard fluent</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/jamesharling/GlobalPlatform.NET/master/docs/nuget-icon.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\GlobalPlatform.NET.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\GlobalPlatform.NET.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="NETStandard.Library" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
