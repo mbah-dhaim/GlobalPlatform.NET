@@ -87,11 +87,6 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public byte[] HostCryptogram { get; private set; }
 
-        public Apdu ExternalAuthenticateCommand => Commands.ExternalAuthenticateCommand.Build
-            .WithSecurityLevel(this.SecurityLevel)
-            .UsingHostCryptogram(this.HostCryptogram)
-            .AsApdu();
-
         /// <summary>
         /// Based on section E.1.5 of the v2.3 GlobalPlatform Card Specification. 
         /// </summary>
