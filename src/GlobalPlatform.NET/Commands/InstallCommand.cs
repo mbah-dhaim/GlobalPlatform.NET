@@ -270,7 +270,12 @@ namespace GlobalPlatform.NET.Commands
 
         public IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] securityDomainAID)
         {
-            Ensure.IsAID(securityDomainAID, nameof(securityDomainAID));
+            Ensure.IsNotNull(securityDomainAID, nameof(securityDomainAID));
+
+            if (securityDomainAID.Any())
+            {
+                Ensure.IsAID(securityDomainAID, nameof(securityDomainAID));
+            }
 
             this.forLoadSecurityDomainAID = securityDomainAID;
 
@@ -279,7 +284,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IInstallCommandForLoadParametersPicker WithDataBlockHash(byte[] hash)
         {
-            Ensure.IsNotNullOrEmpty(hash, nameof(hash));
+            Ensure.HasCount(hash, nameof(hash), 0, 0x7F);
 
             this.forLoadDataBlockHash = hash;
 
@@ -288,7 +293,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IInstallCommandForLoadTokenPicker WithParameters(byte[] parameters)
         {
-            Ensure.IsNotNullOrEmpty(parameters, nameof(parameters));
+            Ensure.IsNotNull(parameters, nameof(parameters));
 
             this.forLoadParameters = parameters;
 
@@ -297,7 +302,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IInstallCommandForLoadBuilder WithToken(byte[] token)
         {
-            Ensure.IsNotNullOrEmpty(token, nameof(token));
+            Ensure.IsNotNull(token, nameof(token));
 
             this.forLoadToken = token;
 
@@ -343,7 +348,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IInstallCommandForInstallParametersPicker WithPrivileges(byte[] privileges)
         {
-            Ensure.IsNotNullOrEmpty(privileges, nameof(privileges));
+            Ensure.HasCount(privileges, nameof(privileges), 1, 3);
 
             this.forInstallPrivileges = privileges;
 
@@ -352,7 +357,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForInstallTokenPicker IInstallCommandForInstallParametersPicker.WithParameters(byte[] parameters)
         {
-            Ensure.IsNotNullOrEmpty(parameters, nameof(parameters));
+            Ensure.HasAtLeast(parameters, nameof(parameters), 2);
 
             this.forInstallParameters = parameters;
 
@@ -361,7 +366,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForInstallBuilder IInstallCommandForInstallTokenPicker.WithToken(byte[] token)
         {
-            Ensure.IsNotNullOrEmpty(token, nameof(token));
+            Ensure.IsNotNull(token, nameof(token));
 
             this.forInstallToken = token;
 
@@ -389,7 +394,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForMakeSelectableParametersPicker IInstallCommandForMakeSelectablePrivilegesPicker.WithPrivileges(byte[] privileges)
         {
-            Ensure.IsNotNullOrEmpty(privileges, nameof(privileges));
+            Ensure.HasCount(privileges, nameof(privileges), 1, 3);
 
             this.forMakeSelectablePrivileges = privileges;
 
@@ -398,7 +403,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForMakeSelectableTokenPicker IInstallCommandForMakeSelectableParametersPicker.WithParameters(byte[] parameters)
         {
-            Ensure.IsNotNullOrEmpty(parameters, nameof(parameters));
+            Ensure.IsNotNull(parameters, nameof(parameters));
 
             this.forMakeSelectableParameters = parameters;
 
@@ -407,7 +412,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForMakeSelectableBuilder IInstallCommandForMakeSelectableTokenPicker.WithToken(byte[] token)
         {
-            Ensure.IsNotNullOrEmpty(token, nameof(token));
+            Ensure.IsNotNull(token, nameof(token));
 
             this.forMakeSelectableToken = token;
 
@@ -441,7 +446,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForExtraditionTokenPicker IInstallCommandForExtraditionParametersPicker.WithParameters(byte[] parameters)
         {
-            Ensure.IsNotNullOrEmpty(parameters, nameof(parameters));
+            Ensure.IsNotNull(parameters, nameof(parameters));
 
             this.forExtraditionParameters = parameters;
 
@@ -450,7 +455,7 @@ namespace GlobalPlatform.NET.Commands
 
         IMultiApduBuilder IInstallCommandForExtraditionTokenPicker.WithToken(byte[] token)
         {
-            Ensure.IsNotNullOrEmpty(token, nameof(token));
+            Ensure.IsNotNull(token, nameof(token));
 
             this.forExtraditionToken = token;
 
@@ -464,20 +469,30 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        IInstallCommandForRegistryUpdateSecurityDomainPicker IInstallCommandForRegistryUpdateApplicationPicker.Extradite(byte[] applicationAid)
+        IInstallCommandForRegistryUpdateSecurityDomainPicker IInstallCommandForRegistryUpdateApplicationPicker.Extradite(byte[] applicationAID)
         {
-            Ensure.IsAID(applicationAid, nameof(applicationAid));
+            Ensure.IsNotNull(applicationAID, nameof(applicationAID));
 
-            this.forRegistryUpdateApplicationAID = applicationAid;
+            if (applicationAID.Any())
+            {
+                Ensure.IsAID(applicationAID, nameof(applicationAID));
+            }
+
+            this.forRegistryUpdateApplicationAID = applicationAID;
 
             return this;
         }
 
-        IInstallCommandForRegistryUpdatePrivilegesPicker IInstallCommandForRegistryUpdateSecurityDomainPicker.To(byte[] securityDomainAid)
+        IInstallCommandForRegistryUpdatePrivilegesPicker IInstallCommandForRegistryUpdateSecurityDomainPicker.To(byte[] securityDomainAID)
         {
-            Ensure.IsAID(securityDomainAid, nameof(securityDomainAid));
+            Ensure.IsNotNull(securityDomainAID, nameof(securityDomainAID));
 
-            this.forRegistryUpdateSecurityDomainAID = securityDomainAid;
+            if (securityDomainAID.Any())
+            {
+                Ensure.IsAID(securityDomainAID, nameof(securityDomainAID));
+            }
+
+            this.forRegistryUpdateSecurityDomainAID = securityDomainAID;
 
             return this;
         }
@@ -487,7 +502,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForRegistryUpdateParametersPicker IInstallCommandForRegistryUpdatePrivilegesPicker.WithPrivileges(byte[] privileges)
         {
-            Ensure.IsNotNullOrEmpty(privileges, nameof(privileges));
+            Ensure.HasCount(privileges, nameof(privileges), 0, 1, 3);
 
             this.forRegistryUpdatePrivileges = privileges;
 
@@ -496,7 +511,7 @@ namespace GlobalPlatform.NET.Commands
 
         IInstallCommandForRegistryUpdateTokenPicker IInstallCommandForRegistryUpdateParametersPicker.WithParameters(byte[] parameters)
         {
-            Ensure.IsNotNullOrEmpty(parameters, nameof(parameters));
+            Ensure.IsNotNull(parameters, nameof(parameters));
 
             this.forRegistryUpdateParameters = parameters;
 
@@ -505,7 +520,7 @@ namespace GlobalPlatform.NET.Commands
 
         IApduBuilder IInstallCommandForRegistryUpdateTokenPicker.WithToken(byte[] token)
         {
-            Ensure.IsNotNullOrEmpty(token, nameof(token));
+            Ensure.IsNotNull(token, nameof(token));
 
             this.forRegistryUpdateToken = token;
 

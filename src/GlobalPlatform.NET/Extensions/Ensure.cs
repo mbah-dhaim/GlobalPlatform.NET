@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Extensions
 {
@@ -35,14 +36,14 @@ namespace GlobalPlatform.NET.Extensions
             IsNotEmpty(instance, name);
         }
 
-        public static void HasCount<T>(ICollection<T> instance, string name, int count)
+        public static void HasCount<T>(ICollection<T> instance, string name, params int[] counts)
         {
             IsNotNull(instance, name);
             IsNotEmpty(instance, name);
 
-            if (instance.Count != count)
+            if (counts.All(x => x != instance.Count))
             {
-                throw new ArgumentException($"{name} does not have the expected count of {count}.", name);
+                throw new ArgumentException($"{name} does not have an expected count of {String.Join(", ", counts)}.", name);
             }
         }
 
