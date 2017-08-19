@@ -12,6 +12,7 @@ namespace GlobalPlatform.NET.Tests
         protected static readonly byte[] ExecutableModuleAID = Enumerable.Repeat<byte>(0xBB, 8).ToArray();
         protected static readonly byte[] ApplicationAID = Enumerable.Repeat<byte>(0xFF, 8).ToArray();
         protected static readonly byte[] Token = Enumerable.Repeat<byte>(0xEE, 4).ToArray();
+        protected static readonly byte[] Token = Enumerable.Repeat<byte>(0x11, 4).ToArray();
         protected static readonly byte[] KeyData = Enumerable.Range(64, 16).Select(x => (byte)x).ToArray();
     }
 
