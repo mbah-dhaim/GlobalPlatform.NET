@@ -74,6 +74,8 @@ namespace GlobalPlatform.NET.Reference
             return bytes.ToArray();
         }
 
+        public static byte[] Empty => new Privileges().AsBytes();
+
         public static byte[] SecurityDomain => Build.WithByte1(Byte1.SecurityDomain).AsBytes();
 
         public static class Byte1
