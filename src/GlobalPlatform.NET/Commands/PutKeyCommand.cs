@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using GlobalPlatform.NET.Tools;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Commands
@@ -146,20 +147,20 @@ namespace GlobalPlatform.NET.Commands
 
             data.Add((byte)this.key1.KeyType);
             data.AddRangeWithLength(TripleDES.Encrypt(this.key1.Value, this.encryptionKey, CipherMode.ECB));
-            data.Add(0x00);
+            data.AddRangeWithLength(KeyCheckValue.Generate(this.key1.KeyType, this.key1.Value));
 
             if (this.key2.Value.Any())
             {
                 data.Add((byte)this.key2.KeyType);
                 data.AddRangeWithLength(TripleDES.Encrypt(this.key2.Value, this.encryptionKey, CipherMode.ECB));
-                data.Add(0x00);
+                data.AddRangeWithLength(KeyCheckValue.Generate(this.key2.KeyType, this.key2.Value));
             }
 
             if (this.key3.Value.Any())
             {
                 data.Add((byte)this.key3.KeyType);
                 data.AddRangeWithLength(TripleDES.Encrypt(this.key3.Value, this.encryptionKey, CipherMode.ECB));
-                data.Add(0x00);
+                data.AddRangeWithLength(KeyCheckValue.Generate(this.key3.KeyType, this.key3.Value));
             }
 
             apdu.CommandData = data.ToArray();

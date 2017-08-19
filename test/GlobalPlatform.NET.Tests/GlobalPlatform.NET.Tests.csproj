@@ -70,6 +70,7 @@
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecureChannelTests.cs" />
+    <Compile Include="ToolTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
