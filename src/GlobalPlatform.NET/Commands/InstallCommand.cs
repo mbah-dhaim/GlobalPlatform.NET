@@ -10,15 +10,15 @@ namespace GlobalPlatform.NET.Commands
 {
     public interface IInstallCommandForLoadPicker : IInstallCommandForInstallPicker
     {
-        IInstallCommandForLoadAidPicker ForLoad();
+        IInstallCommandForLoadApplicationPicker ForLoad();
     }
 
-    public interface IInstallCommandForLoadAidPicker
+    public interface IInstallCommandForLoadApplicationPicker
     {
-        IInstallCommandForLoadSecurityDomainAidPicker Load(byte[] applicationAID);
+        IInstallCommandForLoadSecurityDomainPicker Load(byte[] loadFileAID);
     }
 
-    public interface IInstallCommandForLoadSecurityDomainAidPicker
+    public interface IInstallCommandForLoadSecurityDomainPicker
     {
         IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] securityDomainAID);
     }
@@ -45,7 +45,7 @@ namespace GlobalPlatform.NET.Commands
 
     public interface IInstallCommandForInstallExecutableLoadFilePicker
     {
-        IInstallCommandForInstallExecutableModulePicker InstallFromLoadFile(byte[] loadFileAID);
+        IInstallCommandForInstallExecutableModulePicker FromLoadFile(byte[] loadFileAID);
     }
 
     public interface IInstallCommandForInstallExecutableModulePicker
@@ -177,11 +177,8 @@ namespace GlobalPlatform.NET.Commands
     /// </summary>
     public class InstallCommand : MultiCommandBase<InstallCommand, IInstallCommandForLoadPicker>,
         IInstallCommandForLoadPicker,
-        IInstallCommandForExtraditionPicker,
-        IInstallCommandForRegistryUpdatePicker,
-        IInstallCommandForPersonalizationPicker,
-        IInstallCommandForLoadAidPicker,
-        IInstallCommandForLoadSecurityDomainAidPicker,
+        IInstallCommandForLoadApplicationPicker,
+        IInstallCommandForLoadSecurityDomainPicker,
         IInstallCommandForLoadDataBlockHashPicker,
         IInstallCommandForLoadParametersPicker,
         IInstallCommandForLoadTokenPicker,
@@ -193,15 +190,17 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForMakeSelectableApplicationPicker,
         IInstallCommandForMakeSelectablePrivilegesPicker,
         IInstallCommandForMakeSelectableParametersPicker,
+        IInstallCommandForExtraditionPicker,
         IInstallCommandForExtraditionApplicationPicker,
         IInstallCommandForExtraditionSecurityDomainPicker,
         IInstallCommandForExtraditionParametersPicker,
+        IInstallCommandForRegistryUpdatePicker,
         IInstallCommandForRegistryUpdateApplicationPicker,
         IInstallCommandForRegistryUpdateSecurityDomainPicker,
         IInstallCommandForRegistryUpdatePrivilegesPicker,
         IInstallCommandForRegistryUpdateParametersPicker,
+        IInstallCommandForPersonalizationPicker,
         IInstallCommandForPersonalizationApplicationPicker
-
     {
         private const byte forLoad = 0b00000010;
         private const byte forInstall = 0b00000100;
@@ -210,7 +209,7 @@ namespace GlobalPlatform.NET.Commands
         private const byte forRegistryUpdate = 0b01000000;
         private const byte forPersonalization = 0b00100000;
 
-        private byte[] forLoadAID;
+        private byte[] forLoadLoadFileAID;
         private byte[] forLoadSecurityDomainAID;
         private byte[] forLoadDataBlockHash = new byte[0];
         private byte[] forLoadParameters = new byte[0];
@@ -236,27 +235,27 @@ namespace GlobalPlatform.NET.Commands
         private byte[] forRegistryUpdateToken = new byte[0];
         private byte[] forPersonalizationApplicationAID;
 
-        public IInstallCommandForLoadAidPicker ForLoad()
+        public IInstallCommandForLoadApplicationPicker ForLoad()
         {
             this.P1 |= forLoad;
 
             return this;
         }
 
-        public IInstallCommandForLoadSecurityDomainAidPicker Load(byte[] aid)
+        public IInstallCommandForLoadSecurityDomainPicker Load(byte[] loadFileAID)
         {
-            Ensure.IsAID(aid, nameof(aid));
+            Ensure.IsAID(loadFileAID, nameof(loadFileAID));
 
-            this.forLoadAID = aid;
+            this.forLoadLoadFileAID = loadFileAID;
 
             return this;
         }
 
-        public IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] aid)
+        public IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] securityDomainAID)
         {
-            Ensure.IsAID(aid, nameof(aid));
+            Ensure.IsAID(securityDomainAID, nameof(securityDomainAID));
 
-            this.forLoadSecurityDomainAID = aid;
+            this.forLoadSecurityDomainAID = securityDomainAID;
 
             return this;
         }
@@ -295,7 +294,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public IInstallCommandForInstallExecutableModulePicker InstallFromLoadFile(byte[] loadFileAID)
+        public IInstallCommandForInstallExecutableModulePicker FromLoadFile(byte[] loadFileAID)
         {
             Ensure.IsAID(loadFileAID, nameof(loadFileAID));
 
@@ -572,7 +571,7 @@ namespace GlobalPlatform.NET.Commands
         {
             var commandData = new List<byte>();
 
-            commandData.AddRangeWithLength(this.forLoadAID);
+            commandData.AddRangeWithLength(this.forLoadLoadFileAID);
             commandData.AddRangeWithLength(this.forLoadSecurityDomainAID);
             commandData.AddRangeWithLength(this.forLoadDataBlockHash);
             commandData.AddRangeWithLength(this.forLoadParameters);
@@ -643,12 +642,7 @@ namespace GlobalPlatform.NET.Commands
 
         private Apdu Build(IEnumerable<byte> commandData, bool moreCommands = false)
         {
-            byte p2 = 0x00;
-
-            if (moreCommands)
-            {
-                p2 |= 0b10000000;
-            }
+            byte p2 = moreCommands ? (byte)0x80 : (byte)0x00;
 
             return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, this.P1, p2, commandData.ToArray());
         }
