@@ -14,6 +14,7 @@ namespace GlobalPlatform.NET.Tests
         protected static readonly byte[] ApplicationAID = Enumerable.Repeat<byte>(0xFF, 8).ToArray();
         protected static readonly byte[] Token = Enumerable.Repeat<byte>(0x11, 4).ToArray();
         protected static readonly byte[] Hash = Enumerable.Repeat<byte>(0x22, 4).ToArray();
+        protected static readonly byte[] Signature = Enumerable.Repeat<byte>(0x33, 4).ToArray();
         protected static readonly byte[] KeyData = Enumerable.Range(64, 16).Select(x => (byte)x).ToArray();
         protected static readonly byte[] InstallParameters = { 0xC9, 0x00 };
     }

@@ -3,6 +3,7 @@ using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using GlobalPlatform.NET.Reference;
 
@@ -23,6 +24,19 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .AsApdus()
                 .ToList();
 
+            var commandData = new List<byte> { (byte)Tag.LoadFileDataBlock, 0x82 };
+
+            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)data.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+            }
+
+            commandData.AddRange(loadFileDataBlockLength);
+
+            apdus.First().CommandData.Take(4).ShouldBeEquivalentTo(commandData);
+
             byte[] dataBlock = apdus.SelectMany(apdu => apdu.CommandData).ToArray();
 
             apdus.ForEach((apdu, index, isLast) =>
@@ -41,11 +55,33 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             byte blockSize = (byte)new Random().Next(128, 240);
 
             var apdus = LoadCommand.Build
-                .WithDapBlock(ApplicationAID, Enumerable.Range(8, 8).Select(x => (byte)x).ToArray())
+                .WithDapBlock(SecurityDomainAID, Signature)
                 .Load(data)
                 .WithBlockSize(blockSize)
                 .AsApdus()
                 .ToList();
+
+            var commandData = new List<byte>();
+
+            var signatureData = new List<byte>();
+            signatureData.AddTag((byte)Tag.SecurityDomainAID, SecurityDomainAID);
+            signatureData.AddTag((byte)Tag.LoadFileDataBlockSignature, Signature);
+
+            commandData.AddTag((byte)Tag.DapBlock, signatureData.ToArray());
+
+            commandData.Add((byte)Tag.LoadFileDataBlock);
+            commandData.Add(0x82);
+
+            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)data.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+            }
+
+            commandData.AddRange(loadFileDataBlockLength);
+
+            apdus.First().CommandData.Take(22).ShouldBeEquivalentTo(commandData);
 
             byte[] dataBlock = apdus.SelectMany(apdu => apdu.CommandData).ToArray();
 
