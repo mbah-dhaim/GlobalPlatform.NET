@@ -144,9 +144,13 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForExtraditionTokenPicker WithParameters(byte[] parameters);
     }
 
-    public interface IInstallCommandForExtraditionTokenPicker : IApduBuilder
+    public interface IInstallCommandForExtraditionTokenPicker : IInstallCommandForExtraditionBuilder
     {
-        IMultiApduBuilder WithToken(byte[] token);
+        IInstallCommandForExtraditionBuilder WithToken(byte[] token);
+    }
+
+    public interface IInstallCommandForExtraditionBuilder : IApduBuilder, IMultiApduBuilder
+    {
     }
 
     public interface IInstallCommandForRegistryUpdatePicker
@@ -453,7 +457,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        IMultiApduBuilder IInstallCommandForExtraditionTokenPicker.WithToken(byte[] token)
+        IInstallCommandForExtraditionBuilder IInstallCommandForExtraditionTokenPicker.WithToken(byte[] token)
         {
             Ensure.IsNotNull(token, nameof(token));
 
@@ -643,7 +647,9 @@ namespace GlobalPlatform.NET.Commands
             var commandData = new List<byte>();
 
             commandData.AddRangeWithLength(this.forExtraditionSecurityDomainAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(this.forExtraditionApplicationAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(this.forExtraditionParameters);
             commandData.AddRangeWithLength(this.forExtraditionToken);
 

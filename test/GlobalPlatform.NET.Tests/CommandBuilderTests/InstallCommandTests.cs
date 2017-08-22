@@ -172,13 +172,16 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .Extradite(ApplicationAID)
                 .To(SecurityDomainAID)
                 .WithParameters(InstallParameters)
+                .WithToken(Token)
                 .AsApdu();
 
             var commandData = new List<byte>();
             commandData.AddRangeWithLength(SecurityDomainAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(ApplicationAID);
             commandData.Add(0x00);
             commandData.AddRangeWithLength(InstallParameters);
+            commandData.AddRangeWithLength(Token);
 
             apdu.Assert(ApduInstruction.Install, 0x10, 0x00, commandData.ToArray());
         }
