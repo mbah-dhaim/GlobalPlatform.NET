@@ -76,7 +76,8 @@ namespace GlobalPlatform.NET.Commands
                 ApduInstruction.Load,
                 (byte)(isLast ? 0x80 : 0x00),
                 (byte)index,
-                block.ToArray()));
+                block.ToArray(),
+                0x00));
         }
 
         public IMultiApduBuilder WithBlockSize(byte blockSize)

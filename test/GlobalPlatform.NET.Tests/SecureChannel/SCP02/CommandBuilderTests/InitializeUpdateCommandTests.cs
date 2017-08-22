@@ -1,7 +1,6 @@
-﻿using FluentAssertions;
+﻿using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
 {
@@ -19,10 +18,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .WithHostChallenge(out hostChallenge)
                 .AsApdu();
 
-            apdu.Buffer.Take(4).Should().BeEquivalentTo(new byte[] { 0x80, 0x50, keyVersion, 0x00 });
-            apdu.Lc.Should().Be(0x08);
-            apdu.CommandData.Should().BeEquivalentTo(hostChallenge);
-            apdu.Le.First().Should().Be(0x00);
+            apdu.Assert(ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge);
         }
 
         [TestMethod]
@@ -36,10 +32,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .WithHostChallenge(hostChallenge)
                 .AsApdu();
 
-            apdu.Buffer.Take(4).Should().BeEquivalentTo(new byte[] { 0x80, 0x50, keyVersion, 0x00 });
-            apdu.Lc.Should().Be(0x08);
-            apdu.CommandData.Should().BeEquivalentTo(hostChallenge);
-            apdu.Le.First().Should().Be(0x00);
+            apdu.Assert(ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge);
         }
     }
 }

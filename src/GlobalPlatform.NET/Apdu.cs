@@ -75,7 +75,6 @@ namespace GlobalPlatform.NET
             var apdu = Build(cla, ins, p1, p2);
 
             apdu.CommandData = data;
-            apdu.Le = new byte[] { 0x00 };
 
             return apdu;
         }

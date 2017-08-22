@@ -679,7 +679,7 @@ namespace GlobalPlatform.NET.Commands
         {
             byte p2 = moreCommands ? (byte)0x80 : (byte)0x00;
 
-            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray());
+            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray(), 0x00);
         }
     }
 }
