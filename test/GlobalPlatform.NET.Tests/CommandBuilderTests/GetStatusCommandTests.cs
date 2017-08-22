@@ -27,5 +27,27 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             apdu.Assert(ApduInstruction.GetStatus, 0x10, 0x00, 0x4F, 0x02, 0xA0, 0x00);
         }
+
+        [TestMethod]
+        public void GetStatus_Return_Next_Occurrence()
+        {
+            var apdu = GetStatusCommand.Build
+                .GetStatusOf(GetStatusScope.IssuerSecurityDomain)
+                .ReturnNextOccurrence()
+                .AsApdu();
+
+            apdu.Assert(ApduInstruction.GetStatus, 0x80, 0x01, 0x4F, 0x00);
+        }
+
+        [TestMethod]
+        public void GetStatus_In_Alternate_Format()
+        {
+            var apdu = GetStatusCommand.Build
+                .GetStatusOf(GetStatusScope.IssuerSecurityDomain)
+                .InAlternateFormat()
+                .AsApdu();
+
+            apdu.Assert(ApduInstruction.GetStatus, 0x80, 0x02, 0x4F, 0x00);
+        }
     }
 }
