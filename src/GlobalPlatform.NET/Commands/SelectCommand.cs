@@ -62,6 +62,6 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override Apdu AsApdu() => Apdu.Build(ApduClass.Iso7816, ApduInstruction.Select, 0x04, this.P2, this.application);
+        public override Apdu AsApdu() => Apdu.Build(ApduClass.Iso7816, ApduInstruction.Select, 0x04, this.P2, this.application, 0x00);
     }
 }

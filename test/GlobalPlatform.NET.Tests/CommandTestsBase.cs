@@ -14,6 +14,7 @@ namespace GlobalPlatform.NET.Tests
         protected static readonly byte[] ApplicationAID = Enumerable.Repeat<byte>(0xFF, 8).ToArray();
         protected static readonly byte[] Token = Enumerable.Repeat<byte>(0x11, 4).ToArray();
         protected static readonly byte[] Hash = Enumerable.Repeat<byte>(0x22, 4).ToArray();
+        protected static readonly byte[] Signature = Enumerable.Repeat<byte>(0x33, 4).ToArray();
         protected static readonly byte[] KeyData = Enumerable.Range(64, 16).Select(x => (byte)x).ToArray();
         protected static readonly byte[] InstallParameters = { 0xC9, 0x00 };
     }
@@ -62,7 +63,6 @@ namespace GlobalPlatform.NET.Tests
         /// Asserts that an APDU has a class of <see cref="ApduClass.GlobalPlatform" /> the specified values.
         /// </summary>
         /// <param name="apdu"></param>
-        /// <param name="cla"></param>
         /// <param name="ins"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
@@ -76,7 +76,7 @@ namespace GlobalPlatform.NET.Tests
             apdu.Assert(ins, p1, p2);
 
             apdu.CLA.Should().Be(ApduClass.GlobalPlatform);
-            apdu.Le.ShouldAllBeEquivalentTo(le);
+            apdu.Le.ShouldBeEquivalentTo(new[] { le });
         }
 
         /// <summary>
@@ -97,14 +97,13 @@ namespace GlobalPlatform.NET.Tests
         {
             apdu.Assert(cla, ins, p1, p2);
 
-            apdu.Le.ShouldAllBeEquivalentTo(le);
+            apdu.Le.ShouldBeEquivalentTo(new[] { le });
         }
 
         /// <summary>
         /// Asserts that an APDU has a class of <see cref="ApduClass.GlobalPlatform" /> the specified values.
         /// </summary>
         /// <param name="apdu"></param>
-        /// <param name="cla"></param>
         /// <param name="ins"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
@@ -119,8 +118,31 @@ namespace GlobalPlatform.NET.Tests
 
             apdu.CLA.Should().Be(ApduClass.GlobalPlatform);
             apdu.Lc.Should().Be(checked((byte)apdu.CommandData.Length));
-            apdu.CommandData.ShouldAllBeEquivalentTo(commandData);
-            apdu.Le.ShouldAllBeEquivalentTo(0x00);
+            apdu.CommandData.ShouldBeEquivalentTo(commandData);
+            apdu.Le.ShouldBeEquivalentTo(new byte[] { 0x00 });
+        }
+
+        /// <summary>
+        /// Asserts that an APDU has a class of <see cref="ApduClass.GlobalPlatform" /> the specified values.
+        /// </summary>
+        /// <param name="apdu"></param>
+        /// <param name="ins"></param>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="commandData"></param>
+        public static void Assert(this Apdu apdu,
+            ApduInstruction ins,
+            byte p1,
+            byte p2,
+            byte[] commandData,
+            byte[] le)
+        {
+            apdu.Assert(ins, p1, p2);
+
+            apdu.CLA.Should().Be(ApduClass.GlobalPlatform);
+            apdu.Lc.Should().Be(checked((byte)apdu.CommandData.Length));
+            apdu.CommandData.ShouldBeEquivalentTo(commandData);
+            apdu.Le.ShouldBeEquivalentTo(le);
         }
 
         /// <summary>
@@ -142,8 +164,8 @@ namespace GlobalPlatform.NET.Tests
             apdu.Assert(cla, ins, p1, p2);
 
             apdu.Lc.Should().Be(checked((byte)apdu.CommandData.Length));
-            apdu.CommandData.ShouldAllBeEquivalentTo(commandData);
-            apdu.Le.ShouldAllBeEquivalentTo(0x00);
+            apdu.CommandData.ShouldBeEquivalentTo(commandData);
+            apdu.Le.ShouldBeEquivalentTo(new byte[] { 0x00 });
         }
     }
 }

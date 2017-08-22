@@ -67,6 +67,18 @@ namespace GlobalPlatform.NET.Commands
             }
 
             commandData.Add((byte)Tag.LoadFileDataBlock);
+
+            // Length encoded on 2 further bytes, according to ASN.1
+            commandData.Add(0x82);
+
+            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)this.data.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+            }
+
+            commandData.AddRange(loadFileDataBlockLength);
             commandData.AddRange(this.data);
 
             var chunks = commandData.Split(this.blockSize).ToList();
@@ -76,7 +88,8 @@ namespace GlobalPlatform.NET.Commands
                 ApduInstruction.Load,
                 (byte)(isLast ? 0x80 : 0x00),
                 (byte)index,
-                block.ToArray()));
+                block.ToArray(),
+                0x00));
         }
 
         public IMultiApduBuilder WithBlockSize(byte blockSize)
@@ -104,7 +117,7 @@ namespace GlobalPlatform.NET.Commands
 
         public ILoadCommandBlockSizePicker Load(byte[] data)
         {
-            Ensure.IsNotNullOrEmpty(data, nameof(data));
+            Ensure.HasNoMoreThan(data, nameof(data), 65536);
 
             this.data = data;
 

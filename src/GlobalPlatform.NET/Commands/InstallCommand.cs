@@ -27,7 +27,7 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForLoadSecurityDomainPicker Load(byte[] loadFileAID);
     }
 
-    public interface IInstallCommandForLoadSecurityDomainPicker
+    public interface IInstallCommandForLoadSecurityDomainPicker : IInstallCommandForLoadDataBlockHashPicker
     {
         IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] securityDomainAID);
     }
@@ -144,9 +144,13 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForExtraditionTokenPicker WithParameters(byte[] parameters);
     }
 
-    public interface IInstallCommandForExtraditionTokenPicker : IApduBuilder
+    public interface IInstallCommandForExtraditionTokenPicker : IInstallCommandForExtraditionBuilder
     {
-        IMultiApduBuilder WithToken(byte[] token);
+        IInstallCommandForExtraditionBuilder WithToken(byte[] token);
+    }
+
+    public interface IInstallCommandForExtraditionBuilder : IApduBuilder, IMultiApduBuilder
+    {
     }
 
     public interface IInstallCommandForRegistryUpdatePicker
@@ -200,7 +204,6 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForPicker,
         IInstallCommandForLoadApplicationPicker,
         IInstallCommandForLoadSecurityDomainPicker,
-        IInstallCommandForLoadDataBlockHashPicker,
         IInstallCommandForInstallExecutableLoadFilePicker,
         IInstallCommandForInstallExecutableModulePicker,
         IInstallCommandForInstallApplicationPicker,
@@ -227,7 +230,7 @@ namespace GlobalPlatform.NET.Commands
         private const byte forPersonalization = 0b00100000;
 
         private byte[] forLoadLoadFileAID;
-        private byte[] forLoadSecurityDomainAID;
+        private byte[] forLoadSecurityDomainAID = new byte[0];
         private byte[] forLoadDataBlockHash = new byte[0];
         private byte[] forLoadParameters = new byte[0];
         private byte[] forLoadToken = new byte[0];
@@ -453,7 +456,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        IMultiApduBuilder IInstallCommandForExtraditionTokenPicker.WithToken(byte[] token)
+        IInstallCommandForExtraditionBuilder IInstallCommandForExtraditionTokenPicker.WithToken(byte[] token)
         {
             Ensure.IsNotNull(token, nameof(token));
 
@@ -643,7 +646,9 @@ namespace GlobalPlatform.NET.Commands
             var commandData = new List<byte>();
 
             commandData.AddRangeWithLength(this.forExtraditionSecurityDomainAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(this.forExtraditionApplicationAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(this.forExtraditionParameters);
             commandData.AddRangeWithLength(this.forExtraditionToken);
 
@@ -679,7 +684,7 @@ namespace GlobalPlatform.NET.Commands
         {
             byte p2 = moreCommands ? (byte)0x80 : (byte)0x00;
 
-            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray());
+            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray(), 0x00);
         }
     }
 }

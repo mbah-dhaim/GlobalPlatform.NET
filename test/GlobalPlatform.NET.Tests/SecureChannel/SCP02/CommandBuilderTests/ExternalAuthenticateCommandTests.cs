@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,7 +19,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .UsingHostCryptogram(hostCryptogram)
                 .AsApdu();
 
-            apdu.Buffer.ShouldBeEquivalentTo(new byte[] { 0x80, 0x82, (byte)securityLevel, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 });
+            apdu.Assert(ApduInstruction.ExternalAuthenticate, (byte)securityLevel, 0x00, hostCryptogram, new byte[0]);
         }
     }
 }

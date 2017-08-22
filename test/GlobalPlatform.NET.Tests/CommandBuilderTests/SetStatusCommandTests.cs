@@ -27,7 +27,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .For(ApplicationAID)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.SetStatus, 0x40, 0x0F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+            apdu.Assert(ApduInstruction.SetStatus, 0x40, 0x0F, ApplicationAID, new byte[0]);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .For(ApplicationAID)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.SetStatus, 0x60, 0x07, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+            apdu.Assert(ApduInstruction.SetStatus, 0x60, 0x07, ApplicationAID, new byte[0]);
         }
     }
 }

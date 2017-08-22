@@ -19,9 +19,21 @@ namespace GlobalPlatform.NET.Commands
         IGetStatusApplicationFilter GetStatusOf(GetStatusScope scope);
     }
 
-    public interface IGetStatusApplicationFilter : IApduBuilder
+    public interface IGetStatusApplicationFilter : IGetStatusOccurrencePicker
     {
-        IApduBuilder WithFilter(byte[] applicationFilter);
+        IGetStatusOccurrencePicker WithFilter(byte[] applicationFilter);
+    }
+
+    public interface IGetStatusOccurrencePicker : IGetStatusResponseFormatPicker
+    {
+        IGetStatusResponseFormatPicker ReturnFirstOrAllOccurrences();
+
+        IGetStatusResponseFormatPicker ReturnNextOccurrence();
+    }
+
+    public interface IGetStatusResponseFormatPicker : IApduBuilder
+    {
+        IApduBuilder InAlternateFormat();
     }
 
     /// <summary>
@@ -32,7 +44,9 @@ namespace GlobalPlatform.NET.Commands
     /// </summary>
     public class GetStatusCommand : CommandBase<GetStatusCommand, IGetStatusScopePicker>,
         IGetStatusScopePicker,
-        IGetStatusApplicationFilter
+        IGetStatusApplicationFilter,
+        IGetStatusOccurrencePicker,
+        IGetStatusResponseFormatPicker
     {
         private byte[] applicationFilter = new byte[0];
 
@@ -48,11 +62,27 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public IApduBuilder WithFilter(byte[] applicationFilter)
+        public IGetStatusOccurrencePicker WithFilter(byte[] applicationFilter)
         {
             Ensure.IsNotNull(applicationFilter, nameof(applicationFilter));
 
             this.applicationFilter = applicationFilter;
+
+            return this;
+        }
+
+        public IGetStatusResponseFormatPicker ReturnFirstOrAllOccurrences() => this;
+
+        public IGetStatusResponseFormatPicker ReturnNextOccurrence()
+        {
+            this.P2 |= 0b00000001;
+
+            return this;
+        }
+
+        public IApduBuilder InAlternateFormat()
+        {
+            this.P2 |= 0b00000010;
 
             return this;
         }

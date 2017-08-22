@@ -72,7 +72,7 @@ namespace GlobalPlatform.NET.Commands
             byte p1 = bytes.First();
             byte p2 = bytes.Last();
 
-            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.GetData, p1, p2, this.tagList);
+            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.GetData, p1, p2, this.tagList, 0x00);
         }
     }
 }

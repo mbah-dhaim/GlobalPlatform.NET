@@ -12,7 +12,28 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
     public class InstallCommandTests : CommandTestsBase
     {
         [TestMethod]
-        public void Install_For_Load()
+        public void Install_For_Load_To_Implicit_Destination()
+        {
+            var apdu = InstallCommand.Build
+                .ForLoad()
+                .Load(ExecutableLoadFileAID)
+                .WithDataBlockHash(Hash)
+                .WithParameters(InstallParameters)
+                .WithToken(Token)
+                .AsApdu();
+
+            var commandData = new List<byte>();
+            commandData.AddRangeWithLength(ExecutableLoadFileAID);
+            commandData.Add(0x00);
+            commandData.AddRangeWithLength(Hash);
+            commandData.AddRangeWithLength(InstallParameters);
+            commandData.AddRangeWithLength(Token);
+
+            apdu.Assert(ApduInstruction.Install, 0x02, 0x00, commandData.ToArray());
+        }
+
+        [TestMethod]
+        public void Install_For_Load_To_Explicit_Destination()
         {
             var apdu = InstallCommand.Build
                 .ForLoad()
@@ -172,13 +193,16 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .Extradite(ApplicationAID)
                 .To(SecurityDomainAID)
                 .WithParameters(InstallParameters)
+                .WithToken(Token)
                 .AsApdu();
 
             var commandData = new List<byte>();
             commandData.AddRangeWithLength(SecurityDomainAID);
+            commandData.Add(0x00);
             commandData.AddRangeWithLength(ApplicationAID);
             commandData.Add(0x00);
             commandData.AddRangeWithLength(InstallParameters);
+            commandData.AddRangeWithLength(Token);
 
             apdu.Assert(ApduInstruction.Install, 0x10, 0x00, commandData.ToArray());
         }
