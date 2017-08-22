@@ -27,7 +27,7 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForLoadSecurityDomainPicker Load(byte[] loadFileAID);
     }
 
-    public interface IInstallCommandForLoadSecurityDomainPicker
+    public interface IInstallCommandForLoadSecurityDomainPicker : IInstallCommandForLoadDataBlockHashPicker
     {
         IInstallCommandForLoadDataBlockHashPicker ToSecurityDomain(byte[] securityDomainAID);
     }
@@ -204,7 +204,6 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForPicker,
         IInstallCommandForLoadApplicationPicker,
         IInstallCommandForLoadSecurityDomainPicker,
-        IInstallCommandForLoadDataBlockHashPicker,
         IInstallCommandForInstallExecutableLoadFilePicker,
         IInstallCommandForInstallExecutableModulePicker,
         IInstallCommandForInstallApplicationPicker,
@@ -231,7 +230,7 @@ namespace GlobalPlatform.NET.Commands
         private const byte forPersonalization = 0b00100000;
 
         private byte[] forLoadLoadFileAID;
-        private byte[] forLoadSecurityDomainAID;
+        private byte[] forLoadSecurityDomainAID = new byte[0];
         private byte[] forLoadDataBlockHash = new byte[0];
         private byte[] forLoadParameters = new byte[0];
         private byte[] forLoadToken = new byte[0];
