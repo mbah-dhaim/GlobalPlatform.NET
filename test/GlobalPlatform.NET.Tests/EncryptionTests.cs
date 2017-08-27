@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Linq;
+using FluentAssertions;
+using GlobalPlatform.NET.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
@@ -26,6 +29,28 @@ namespace GlobalPlatform.NET.Tests
             byte[] ciphertext = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77 };
 
             TripleDES.Encrypt(plaintext, key).Should().BeEquivalentTo(ciphertext);
+        }
+
+        [TestMethod]
+        public void Padding()
+        {
+            var bytes = Enumerable.Repeat<byte>(0, 7).ToList();
+
+            var padded = bytes.Pad();
+
+            padded.Count.Should().Be(8);
+
+            bytes = Enumerable.Repeat<byte>(0, 8).ToList();
+
+            padded = bytes.Pad();
+
+            padded.Count.Should().Be(16);
+
+            bytes = Enumerable.Repeat<byte>(0, 9).ToList();
+
+            padded = bytes.Pad();
+
+            padded.Count.Should().Be(16);
         }
     }
 }
