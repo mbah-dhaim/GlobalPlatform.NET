@@ -56,7 +56,10 @@ namespace GlobalPlatform.NET.Extensions
         {
             bytes.Add(0x80);
 
-            bytes.AddRange(Enumerable.Repeat<byte>(0x00, 8 - bytes.Count % 8));
+            if (bytes.Count % 8 != 0)
+            {
+                bytes.AddRange(Enumerable.Repeat<byte>(0x00, 8 - bytes.Count % 8));
+            }
 
             return bytes;
         }
