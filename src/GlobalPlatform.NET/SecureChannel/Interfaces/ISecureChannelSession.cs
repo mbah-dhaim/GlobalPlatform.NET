@@ -5,11 +5,11 @@ namespace GlobalPlatform.NET.SecureChannel.Interfaces
     public interface ISecureChannelSession<out TSecureChannelSession> : ISecureChannelSessionEstablisher<TSecureChannelSession>
         where TSecureChannelSession : ISecureChannelSession<TSecureChannelSession>
     {
-        Apdu SecureApdu(Apdu apdu);
+        CommandApdu SecureApdu(CommandApdu apdu);
 
-        IEnumerable<Apdu> SecureApdu(params Apdu[] apdus);
+        IEnumerable<CommandApdu> SecureApdu(params CommandApdu[] apdus);
 
-        IEnumerable<Apdu> SecureApdu(IEnumerable<Apdu> apdus);
+        IEnumerable<CommandApdu> SecureApdu(IEnumerable<CommandApdu> apdus);
     }
 
     public interface ISecureChannelSessionEstablisher<out TSecureChannelSession>

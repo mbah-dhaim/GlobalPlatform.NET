@@ -66,6 +66,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApduTests\CommandApduTests.cs" />
+    <Compile Include="ApduTests\ResponseApduTests.cs" />
     <Compile Include="CommandBuilderTests\InstallCommandTests.cs" />
     <Compile Include="CommandTestsBase.cs" />
     <Compile Include="CommandBuilderTests\DeleteCommandTests.cs" />

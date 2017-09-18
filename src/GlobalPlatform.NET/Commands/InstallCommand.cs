@@ -546,7 +546,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public Apdu AsApdu()
+        public CommandApdu AsApdu()
         {
             switch (this.P1)
             {
@@ -575,7 +575,7 @@ namespace GlobalPlatform.NET.Commands
 
         public byte[] AsBytes() => this.AsApdu().Buffer;
 
-        public override IEnumerable<Apdu> AsApdus()
+        public override IEnumerable<CommandApdu> AsApdus()
         {
             bool HasOption(byte option)
             {
@@ -602,7 +602,7 @@ namespace GlobalPlatform.NET.Commands
             }
         }
 
-        private Apdu BuildForLoad(bool moreCommands = false)
+        private CommandApdu BuildForLoad(bool moreCommands = false)
         {
             var commandData = new List<byte>();
 
@@ -615,7 +615,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forLoad, commandData, moreCommands);
         }
 
-        private Apdu BuildForInstall(bool moreCommands = false)
+        private CommandApdu BuildForInstall(bool moreCommands = false)
         {
             var commandData = new List<byte>();
 
@@ -629,7 +629,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forInstall, commandData, moreCommands);
         }
 
-        private Apdu BuildForMakeSelectable()
+        private CommandApdu BuildForMakeSelectable()
         {
             var commandData = new List<byte> { 0x00, 0x00 };
 
@@ -641,7 +641,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forMakeSelectable, commandData);
         }
 
-        private Apdu BuildForExtradition()
+        private CommandApdu BuildForExtradition()
         {
             var commandData = new List<byte>();
 
@@ -655,7 +655,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forExtradition, commandData);
         }
 
-        private Apdu BuildForRegistryUpdate()
+        private CommandApdu BuildForRegistryUpdate()
         {
             var commandData = new List<byte>();
 
@@ -668,7 +668,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forRegistryUpdate, commandData);
         }
 
-        private Apdu BuildForPersonalization()
+        private CommandApdu BuildForPersonalization()
         {
             var commandData = new List<byte> { 0x00, 0x00 };
 
@@ -680,11 +680,11 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(forPersonalization, commandData);
         }
 
-        private Apdu Build(byte p1, IEnumerable<byte> commandData, bool moreCommands = false)
+        private CommandApdu Build(byte p1, IEnumerable<byte> commandData, bool moreCommands = false)
         {
             byte p2 = moreCommands ? (byte)0x80 : (byte)0x00;
 
-            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray(), 0x00);
+            return CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray(), 0x00);
         }
     }
 }

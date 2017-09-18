@@ -53,7 +53,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override Apdu AsApdu()
+        public override CommandApdu AsApdu()
         {
             this.P1 = (byte)this.operation;
             this.P2 = this.operation == Operation.Close ? this.identifier : (byte)0x00;
@@ -61,10 +61,10 @@ namespace GlobalPlatform.NET.Commands
             switch (this.operation)
             {
                 case Operation.Open:
-                    return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, this.P1, this.P2, 0x01);
+                    return CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, this.P1, this.P2, 0x01);
 
                 case Operation.Close:
-                    return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, this.P1, this.P2);
+                    return CommandApdu.Case1(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, this.P1, this.P2);
 
                 default:
                     throw new NotSupportedException("Operation not supported.");

@@ -53,7 +53,7 @@ namespace GlobalPlatform.NET.Commands
         private byte[] securityDomainAID = new byte[0];
         private byte[] signature = new byte[0];
 
-        public override IEnumerable<Apdu> AsApdus()
+        public override IEnumerable<CommandApdu> AsApdus()
         {
             var commandData = new List<byte>();
 
@@ -83,7 +83,7 @@ namespace GlobalPlatform.NET.Commands
 
             var chunks = commandData.Split(this.blockSize).ToList();
 
-            return chunks.Select((block, index, isLast) => Apdu.Build(
+            return chunks.Select((block, index, isLast) => CommandApdu.Case4S(
                 ApduClass.GlobalPlatform,
                 ApduInstruction.Load,
                 (byte)(isLast ? 0x80 : 0x00),

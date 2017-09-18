@@ -87,9 +87,9 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override Apdu AsApdu()
+        public override CommandApdu AsApdu()
         {
-            var apdu = Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, this.P1, this.P2, 0x00);
+            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, this.P1, this.P2, 0x00);
 
             var data = new List<byte>();
 

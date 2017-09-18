@@ -45,7 +45,7 @@ namespace GlobalPlatform.NET.Extensions
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static byte LengthChecked(this byte[] array) => checked((byte)array.Length);
+        public static byte LengthChecked(this IEnumerable<byte> array) => checked((byte)array.Count());
 
         /// <summary>
         /// Pads a byte array using ISO/IEC 7816-4. 

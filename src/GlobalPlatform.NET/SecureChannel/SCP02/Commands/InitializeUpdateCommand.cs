@@ -71,6 +71,6 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
             return this;
         }
 
-        public override Apdu AsApdu() => Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.InitializeUpdate, this.P1, this.P2, this.hostChallenge, 0x00);
+        public override CommandApdu AsApdu() => CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.InitializeUpdate, this.P1, this.P2, this.hostChallenge, 0x00);
     }
 }

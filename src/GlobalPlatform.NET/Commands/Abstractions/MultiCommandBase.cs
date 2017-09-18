@@ -16,7 +16,7 @@ namespace GlobalPlatform.NET.Commands.Abstractions
         /// </summary>
         public static TBuilder Build => new TCommand();
 
-        public abstract IEnumerable<Apdu> AsApdus();
+        public abstract IEnumerable<CommandApdu> AsApdus();
 
         public IEnumerable<byte[]> AsBytes() => this.AsApdus().Select(apdu => apdu.Buffer);
     }

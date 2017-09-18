@@ -2,7 +2,7 @@
 {
     public interface IApduBuilder
     {
-        Apdu AsApdu();
+        CommandApdu AsApdu();
 
         byte[] AsBytes();
     }

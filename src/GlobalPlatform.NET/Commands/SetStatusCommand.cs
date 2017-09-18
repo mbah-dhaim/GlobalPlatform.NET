@@ -99,18 +99,18 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override Apdu AsApdu()
+        public override CommandApdu AsApdu()
         {
             this.P1 = (byte)this.scope;
 
             switch (this.scope)
             {
                 case Scope.IssuerSecurityDomain:
-                    return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, this.P1, this.P2);
+                    return CommandApdu.Case1(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, this.P1, this.P2);
 
                 case Scope.SecurityDomain:
                 case Scope.Application:
-                    return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, this.P1, this.P2, this.application);
+                    return CommandApdu.Case3S(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, this.P1, this.P2, this.application);
 
                 default:
                     throw new NotSupportedException("Scope not supported.");
