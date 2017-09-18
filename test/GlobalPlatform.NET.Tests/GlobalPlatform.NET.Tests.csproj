@@ -84,7 +84,8 @@
     <Compile Include="SecureChannel\SCP02\Scp02Tests.cs" />
     <Compile Include="SecureChannel\SCP02\CommandBuilderTests\ExternalAuthenticateCommandTests.cs" />
     <Compile Include="SecureChannel\SCP02\CommandBuilderTests\InitializeUpdateCommandTests.cs" />
-    <Compile Include="ToolTests.cs" />
+    <Compile Include="ToolsTests\KeyCheckValueTests.cs" />
+    <Compile Include="ToolsTests\TlvTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,12 +1,12 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using GlobalPlatform.NET.Reference;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
-namespace GlobalPlatform.NET.Tests
+namespace GlobalPlatform.NET.Tests.ToolsTests
 {
     [TestClass]
-    public class ToolTests
+    public class KeyCheckValueTests
     {
         [TestMethod]
         public void KeyCheckValue()
