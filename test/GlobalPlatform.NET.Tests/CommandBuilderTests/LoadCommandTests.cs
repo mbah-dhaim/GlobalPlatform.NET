@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GlobalPlatform.NET.Reference;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 {
@@ -63,11 +64,12 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             var commandData = new List<byte>();
 
-            var signatureData = new List<byte>();
-            signatureData.AddTag((byte)Tag.SecurityDomainAID, SecurityDomainAID);
-            signatureData.AddTag((byte)Tag.LoadFileDataBlockSignature, Signature);
+            var dapBlock = TLV.Build((byte)Tag.DapBlock,
+                TLV.Build((byte)Tag.SecurityDomainAID, SecurityDomainAID),
+                TLV.Build((byte)Tag.LoadFileDataBlockSignature, Signature)
+            );
 
-            commandData.AddTag((byte)Tag.DapBlock, signatureData.ToArray());
+            commandData.AddTLV(dapBlock);
 
             commandData.Add((byte)Tag.LoadFileDataBlock);
             commandData.Add(0x82);

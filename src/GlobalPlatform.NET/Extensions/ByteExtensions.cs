@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GlobalPlatform.NET.Tools;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GlobalPlatform.NET.Extensions
@@ -22,23 +23,10 @@ namespace GlobalPlatform.NET.Extensions
         }
 
         /// <summary>
-        /// Adds a tag to the collection, followed by the length of the data, followed by the data itself. 
+        /// Adds TLV-encoded data to the collection. 
         /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="tag"></param>
-        /// <param name="data"></param>
         /// <returns></returns>
-        public static byte AddTag(this ICollection<byte> bytes, byte tag, params byte[] data)
-        {
-            bytes.Add(tag);
-
-            byte length = data.LengthChecked();
-
-            bytes.Add(length);
-            bytes.AddRange(data);
-
-            return length;
-        }
+        public static void AddTLV(this ICollection<byte> bytes, TLV tlv) => bytes.AddRange(tlv.Data);
 
         /// <summary>
         /// Returns the length of the array, as a checked byte. 

@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
+using GlobalPlatform.NET.Tools;
 using System.Collections.Generic;
 
 namespace GlobalPlatform.NET.Commands
@@ -93,7 +94,7 @@ namespace GlobalPlatform.NET.Commands
 
             var data = new List<byte>();
 
-            data.AddTag((byte)Tag.ApplicationAID, this.applicationFilter);
+            data.AddTLV(TLV.Build((byte)Tag.ApplicationAID, this.applicationFilter));
 
             apdu.CommandData = data.ToArray();
 

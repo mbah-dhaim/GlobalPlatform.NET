@@ -5,6 +5,7 @@ using GlobalPlatform.NET.Reference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -59,11 +60,12 @@ namespace GlobalPlatform.NET.Commands
 
             if (this.securityDomainAID.Any())
             {
-                var signatureData = new List<byte>();
-                signatureData.AddTag((byte)Tag.SecurityDomainAID, this.securityDomainAID);
-                signatureData.AddTag((byte)Tag.LoadFileDataBlockSignature, this.signature);
+                var dapBlock = TLV.Build((byte) Tag.DapBlock,
+                    TLV.Build((byte) Tag.SecurityDomainAID, this.securityDomainAID),
+                    TLV.Build((byte) Tag.LoadFileDataBlockSignature, this.signature)
+                );
 
-                commandData.AddTag((byte)Tag.DapBlock, signatureData.ToArray());
+                commandData.AddTLV(dapBlock);
             }
 
             commandData.Add((byte)Tag.LoadFileDataBlock);
