@@ -66,7 +66,7 @@ namespace GlobalPlatform.NET.Commands
 
             if (BitConverter.IsLittleEndian)
             {
-                bytes = bytes.Reverse().ToArray();
+                Array.Reverse(bytes);
             }
 
             byte p1 = bytes.First();

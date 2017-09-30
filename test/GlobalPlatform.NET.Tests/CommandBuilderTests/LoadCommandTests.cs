@@ -31,7 +31,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             if (BitConverter.IsLittleEndian)
             {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+                Array.Reverse(loadFileDataBlockLength);
             }
 
             commandData.AddRange(loadFileDataBlockLength);
@@ -78,7 +78,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             if (BitConverter.IsLittleEndian)
             {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+                Array.Reverse(loadFileDataBlockLength);
             }
 
             commandData.AddRange(loadFileDataBlockLength);

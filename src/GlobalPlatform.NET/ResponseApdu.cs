@@ -40,7 +40,7 @@ namespace GlobalPlatform.NET
 
                         if (BitConverter.IsLittleEndian)
                         {
-                            bytes = bytes.Reverse().ToArray();
+                            Array.Reverse(bytes);
                         }
 
                         ushort status = BitConverter.ToUInt16(bytes, 0);

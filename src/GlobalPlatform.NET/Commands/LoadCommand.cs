@@ -77,7 +77,7 @@ namespace GlobalPlatform.NET.Commands
 
             if (BitConverter.IsLittleEndian)
             {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+                Array.Reverse(loadFileDataBlockLength);
             }
 
             commandData.AddRange(loadFileDataBlockLength);
