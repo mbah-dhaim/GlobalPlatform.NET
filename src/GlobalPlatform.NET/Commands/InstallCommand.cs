@@ -689,7 +689,7 @@ namespace GlobalPlatform.NET.Commands
             }
         }
 
-        public byte[] AsBytes() => this.AsApdu().Buffer;
+        public new byte[] AsBytes() => this.AsApdu().Buffer;
 
         public override IEnumerable<CommandApdu> AsApdus()
         {
@@ -827,7 +827,7 @@ namespace GlobalPlatform.NET.Commands
             return this.Build(commandData);
         }
 
-        private CommandApdu Build(IEnumerable<byte> commandData, byte p2 = 0x00)
+        private new CommandApdu Build(IEnumerable<byte> commandData, byte p2 = 0x00)
         {
             return CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.Install, this.P1, p2, commandData.ToArray(), 0x00);
         }
