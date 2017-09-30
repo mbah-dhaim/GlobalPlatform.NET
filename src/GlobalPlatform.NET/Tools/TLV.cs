@@ -17,15 +17,55 @@ namespace GlobalPlatform.NET.Tools
         private IList<byte> value;
         private readonly List<TLV> nestedTags = new List<TLV>();
 
-        public IEnumerable<byte> Tag => this.tag;
+        /// <summary>
+        /// Returns the bytes that comprise the tag. 
+        /// </summary>
+        public IEnumerable<byte> Tag
+        {
+            get => this.tag;
+            set
+            {
+                if (IsTagConstructed(value) && this.NestedTags.Any())
+                {
+                    throw new ArgumentException("A primitive tag may not contain TLV-encoded data.", nameof(value));
+                }
+            }
+        }
 
-        public int Length => this.Value.Count;
+        /// <summary>
+        /// Returns the length of <see cref="Value" />. 
+        /// </summary>
+        public int Length => this.Value.Count();
 
-        public IList<byte> Value => IsTagConstructed(this.Tag) ? this.NestedTags.SelectMany(x => x.Data).ToList() : this.value.ToList();
+        /// <summary>
+        /// Returns the value.
+        /// </summary>
+        public IEnumerable<byte> Value
+        {
+            get => IsTagConstructed(this.Tag) ? this.NestedTags.SelectMany(x => x.Data).ToList() : this.value.ToList();
+            set
+            {
+                if (IsTagConstructed(this.Tag))
+                {
+                    throw new ArgumentException(
+                        "A constructed tag should only contain TLV-encoded data. Add encoded data to the NestedTags collection instead.",
+                        nameof(value));
+                }
 
+                this.value = value.ToList();
+            }
+        }
+
+        /// <summary>
+        /// For a constructed tag, the value of the tag is defined here - as a number of other
+        /// TLV-encoded structures.
+        /// </summary>
         public IReadOnlyCollection<TLV> NestedTags => this.nestedTags;
 
-        public IList<byte> Data
+        /// <summary>
+        /// Serialises the TLV-encoded data to bytes.
+        /// </summary>
+        public IEnumerable<byte> Data
         {
             get
             {
@@ -126,7 +166,7 @@ namespace GlobalPlatform.NET.Tools
         {
             if (!IsTagConstructed(tag.ToArray()))
             {
-                throw new ArgumentException("A primitive tag may not contain TLV-encoded data.");
+                throw new ArgumentException("A primitive tag may not contain TLV-encoded data.", nameof(tag));
             }
 
             var tlv = new TLV
@@ -142,10 +182,12 @@ namespace GlobalPlatform.NET.Tools
         /// <summary>
         /// Parses a block of data encoded using ASN.1 BER-TLV. 
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="bytes"></param>
         /// <returns></returns>
-        public static ICollection<TLV> Parse(IList<byte> data)
+        public static ICollection<TLV> Parse(IEnumerable<byte> bytes)
         {
+            var data = bytes.ToList();
+
             var collection = new List<TLV>();
 
             for (int i = 0, start = 0; i < data.Count; start = i)
@@ -222,7 +264,7 @@ namespace GlobalPlatform.NET.Tools
     public static class TLVExtensions
     {
         /// <summary>
-        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV.
+        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV. 
         /// </summary>
         /// <param name="tlvs"></param>
         /// <param name="tag"></param>
@@ -231,7 +273,8 @@ namespace GlobalPlatform.NET.Tools
             => tlvs.Single(x => x.Tag.SequenceEqual(tag));
 
         /// <summary>
-        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV, or null if the TLV is not present.
+        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV, or
+        /// null if the TLV is not present.
         /// </summary>
         /// <param name="tlvs"></param>
         /// <param name="tag"></param>
@@ -240,7 +283,7 @@ namespace GlobalPlatform.NET.Tools
             => tlvs.SingleOrDefault(x => x.Tag.SequenceEqual(tag));
 
         /// <summary>
-        /// Returns the TLVs in the collection where the supplied tag matches that of the TLV.
+        /// Returns the TLVs in the collection where the supplied tag matches that of the TLV. 
         /// </summary>
         /// <param name="tlvs"></param>
         /// <param name="tag"></param>
