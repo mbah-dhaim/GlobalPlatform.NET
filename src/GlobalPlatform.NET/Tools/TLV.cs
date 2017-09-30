@@ -218,4 +218,34 @@ namespace GlobalPlatform.NET.Tools
             return collection;
         }
     }
+
+    public static class TLVExtensions
+    {
+        /// <summary>
+        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV.
+        /// </summary>
+        /// <param name="tlvs"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static TLV Single(this IEnumerable<TLV> tlvs, params byte[] tag)
+            => tlvs.Single(x => x.Tag.SequenceEqual(tag));
+
+        /// <summary>
+        /// Returns the only TLV in the collection where the supplied tag matches that of the TLV, or null if the TLV is not present.
+        /// </summary>
+        /// <param name="tlvs"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static TLV SingleOrDefault(this IEnumerable<TLV> tlvs, params byte[] tag)
+            => tlvs.SingleOrDefault(x => x.Tag.SequenceEqual(tag));
+
+        /// <summary>
+        /// Returns the TLVs in the collection where the supplied tag matches that of the TLV.
+        /// </summary>
+        /// <param name="tlvs"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static IEnumerable<TLV> Where(this IEnumerable<TLV> tlvs, params byte[] tag)
+            => tlvs.Where(x => x.Tag.SequenceEqual(tag));
+    }
 }
