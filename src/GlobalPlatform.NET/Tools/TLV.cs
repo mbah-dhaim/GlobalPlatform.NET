@@ -1,5 +1,4 @@
-﻿using GlobalPlatform.NET.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,140 +7,215 @@ namespace GlobalPlatform.NET.Tools
     /// <summary>
     /// Builds and parses data encoded using ASN.1 BER-TLV. 
     /// </summary>
-    public static class TLV
+    public class TLV
     {
-        private static byte[] EndOfContent = {0x00, 0x00};
+        private TLV()
+        {
+        }
+
+        private IList<byte> tag;
+        private IList<byte> value;
+        private readonly List<TLV> nestedTags = new List<TLV>();
+
+        public IEnumerable<byte> Tag => this.tag;
+
+        public int Length => this.Value.Count;
+
+        public IList<byte> Value => IsTagConstructed(this.Tag) ? this.NestedTags.SelectMany(x => x.Data).ToList() : this.value.ToList();
+
+        public IReadOnlyCollection<TLV> NestedTags => this.nestedTags;
+
+        public IList<byte> Data
+        {
+            get
+            {
+                var data = new List<byte>();
+
+                data.AddRange(this.Tag);
+
+                if (this.Length < 128)
+                {
+                    data.Add(checked((byte)this.Length));
+                }
+                else
+                {
+                    byte[] lengthBytes = BitConverter.GetBytes(this.Length);
+
+                    if (BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(lengthBytes);
+                    }
+
+                    while (lengthBytes.First() == 0x00)
+                    {
+                        lengthBytes = lengthBytes.Skip(1).ToArray();
+                    }
+
+                    data.Add(checked((byte)(lengthBytes.Length ^ 0b10000000)));
+
+                    data.AddRange(lengthBytes);
+                }
+
+                data.AddRange(this.Value);
+
+                return data;
+            }
+        }
+
+        private static bool IsTagConstructed(byte tag) => IsTagConstructed(new[] { tag });
+
+        private static bool IsTagConstructed(IEnumerable<byte> tag) => (tag.First() & 0b00100000) > 0;
 
         /// <summary>
         /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
         /// </summary>
         /// <param name="tag"></param>
-        /// <param name="data"></param>
         /// <returns></returns>
-        public static ICollection<byte> Build(byte tag, ICollection<byte> data)
+        public static TLV Build(byte tag) => Build(new[] { tag });
+
+        /// <summary>
+        /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+
+        public static TLV Build(IEnumerable<byte> tag) => new TLV
         {
-            var tlv = new List<byte> { tag };
+            tag = tag.ToList(),
+            value = new List<byte>()
+        };
 
-            if (data.Count < 128)
+        /// <summary>
+        /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static TLV Build(byte tag, params byte[] value) => Build(new[] { tag }, value);
+
+        /// <summary>
+        /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+
+        public static TLV Build(IEnumerable<byte> tag, params byte[] value) => new TLV
+        {
+            tag = tag.ToList(),
+            value = value
+        };
+
+        /// <summary>
+        /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="nestedTags"></param>
+        /// <returns></returns>
+
+        public static TLV Build(byte tag, params TLV[] nestedTags) => Build(new[] { tag }, nestedTags);
+
+        /// <summary>
+        /// Encodes a block of data using ASN.1 BER-TLV. Length is encoded as definite. 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="nestedTags"></param>
+        /// <returns></returns>
+
+        public static TLV Build(IEnumerable<byte> tag, params TLV[] nestedTags)
+        {
+            if (!IsTagConstructed(tag.ToArray()))
             {
-                tlv.Add(data.LengthChecked());
+                throw new ArgumentException("A primitive tag may not contain TLV-encoded data.");
             }
-            else
+
+            var tlv = new TLV
             {
-                byte[] lengthBytes = BitConverter.GetBytes(data.Count);
+                tag = tag.ToList()
+            };
 
-                if (BitConverter.IsLittleEndian)
-                {
-                    lengthBytes = lengthBytes.Reverse().ToArray();
-                }
-
-                while (lengthBytes.First() == 0x00)
-                {
-                    lengthBytes = lengthBytes.Skip(1).ToArray();
-                }
-
-                tlv.Add((byte)(lengthBytes.Length ^ 0b10000000));
-
-                tlv.AddRange(lengthBytes);
-            }
-
-            tlv.AddRange(data);
+            tlv.nestedTags.AddRange(nestedTags);
 
             return tlv;
         }
 
         /// <summary>
-        /// Parses a block of data encoded using ASN.1 BER-TLV. Returns the value, disregarding the tag and length bytes.
+        /// Parses a block of data encoded using ASN.1 BER-TLV. 
         /// </summary>
         /// <param name="data"></param>
-        /// <param name="tag"></param>
         /// <returns></returns>
-        public static ICollection<byte> Parse(ICollection<byte> data, byte tag)
+        public static ICollection<TLV> Parse(IList<byte> data)
         {
-            int pos = 0;
+            var collection = new List<TLV>();
 
-            byte Seek(int count = 1) => SeekX(count).First();
-            byte Next() => NextX().First();
-
-            IEnumerable<byte> SeekX(int count = 1)
+            for (int i = 0, start = 0; i < data.Count; start = i)
             {
-                return data.Skip(pos).Take(count);
-            }
+                bool isConstructed = IsTagConstructed(data[i]);
+                bool hasMoreBytes = (data[i] & 0b00011111) == 0b00011111;
 
-            IEnumerable<byte> NextX(int count = 1)
-            {
-                var bytes = data.Skip(pos).Take(count);
+                while (hasMoreBytes && (data[++i] & 0b10000000) > 0) { }
 
-                pos += count;
+                i++;
 
-                return bytes;
-            }
+                var tag = data.Skip(start).Take(i - start);
 
-            bool IsBitHigh(byte b, byte bit)
-            {
-                if (bit > 8)
+                if (data[i] == 0b10000000)
                 {
-                    throw new ArgumentException("Bit index cannot be higher than 8", nameof(bit));
+                    throw new NotSupportedException("Indefinite lengths are not supported.");
                 }
 
-                return (b & (1 << bit - 1)) != 0;
-            }
+                bool hasShortLength = (data[i] & 0b10000000) == 0;
 
-            byte GetBits7Thru1(byte value) => (byte)(value & 0b01111111);
+                int length = 0;
 
-            int GetLength()
-            {
-                byte byte1 = Next();
-
-                if (IsBitHigh(byte1, 8))
+                if (hasShortLength)
                 {
-                    byte numLengthBytes = GetBits7Thru1(byte1);
+                    length = data[i];
+                }
+                else
+                {
+                    int numLengthBytes = data[i] & 0b01111111;
 
-                    switch (numLengthBytes)
+                    if (numLengthBytes > 4)
                     {
-                        case 0:
-                            if (!data.TakeLast(EndOfContent.Length).SequenceEqual(EndOfContent))
-                            {
-                                throw new InvalidOperationException("Length octets suggest indefinite encoding but data does not end with 2 low bytes.");
-                            }
-                            else
-                            {
-                                return data.Count - pos - EndOfContent.Length;
-                            }
-
-                        case 127:
-                            throw new InvalidOperationException("Length octets denoting 'reserved' (0b11111111) are not supported.");
-
-                        default:
-                            var bytes = NextX(numLengthBytes).ToArray();
-
-                            if (bytes.Length < 4)
-                            {
-                                bytes = bytes.Concat(Enumerable.Repeat((byte)0x00, 4 - bytes.Length)).ToArray();
-                            }
-
-                            return BitConverter.ToInt16(bytes, 0);
+                        throw new NotSupportedException("Unable to parse length values exceeding 4 octets.");
                     }
+
+                    var lengthBytes = data.Skip(i + 1).Take(numLengthBytes).ToList();
+
+                    length = lengthBytes.Aggregate(length, (current, lengthByte) => (current << 8) | lengthByte);
                 }
 
-                return GetBits7Thru1(byte1);
+                i = hasShortLength ? i + 1 : i + (data[i] & 0b01111111) + 1;
+
+                var value = data.Skip(i).Take(length).ToList();
+
+                i += length;
+
+                TLV tlv;
+
+                if (isConstructed)
+                {
+                    tlv = new TLV
+                    {
+                        tag = tag.ToArray()
+                    };
+
+                    tlv.nestedTags.AddRange(Parse(value));
+                }
+                else
+                {
+                    tlv = new TLV
+                    {
+                        tag = tag.ToArray(),
+                        value = value
+                    };
+                }
+
+                collection.Add(tlv);
             }
 
-            if (Next() != tag)
-            {
-                throw new InvalidOperationException("First byte of supplied data was not equal to the specified tag.");
-            }
-
-            return NextX(GetLength()).ToList();
+            return collection;
         }
-
-        /// <summary>
-        /// Recursively parses a block of data encoded using ASN.1 BER-TLV, returning the innermost tag value, disregarding the tag and length bytes.
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="tags"></param>
-        /// <returns></returns>
-        public static ICollection<byte> Parse(ICollection<byte> data, params byte[] tags) =>
-            tags.Aggregate(data, Parse);
     }
 }
