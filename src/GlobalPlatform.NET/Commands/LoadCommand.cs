@@ -5,6 +5,7 @@ using GlobalPlatform.NET.Reference;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -53,37 +54,25 @@ namespace GlobalPlatform.NET.Commands
         private byte[] securityDomainAID = new byte[0];
         private byte[] signature = new byte[0];
 
-        public override IEnumerable<Apdu> AsApdus()
+        public override IEnumerable<CommandApdu> AsApdus()
         {
             var commandData = new List<byte>();
 
             if (this.securityDomainAID.Any())
             {
-                var signatureData = new List<byte>();
-                signatureData.AddTag((byte)Tag.SecurityDomainAID, this.securityDomainAID);
-                signatureData.AddTag((byte)Tag.LoadFileDataBlockSignature, this.signature);
+                var dapBlock = TLV.Build((byte) Tag.DapBlock,
+                    TLV.Build((byte) Tag.SecurityDomainAID, this.securityDomainAID),
+                    TLV.Build((byte) Tag.LoadFileDataBlockSignature, this.signature)
+                );
 
-                commandData.AddTag((byte)Tag.DapBlock, signatureData.ToArray());
+                commandData.AddTLV(dapBlock);
             }
 
-            commandData.Add((byte)Tag.LoadFileDataBlock);
-
-            // Length encoded on 2 further bytes, according to ASN.1
-            commandData.Add(0x82);
-
-            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)this.data.Length);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
-            }
-
-            commandData.AddRange(loadFileDataBlockLength);
-            commandData.AddRange(this.data);
+            commandData.AddTLV(TLV.Build((byte)Tag.LoadFileDataBlock, this.data));
 
             var chunks = commandData.Split(this.blockSize).ToList();
 
-            return chunks.Select((block, index, isLast) => Apdu.Build(
+            return chunks.Select((block, index, isLast) => CommandApdu.Case4S(
                 ApduClass.GlobalPlatform,
                 ApduInstruction.Load,
                 (byte)(isLast ? 0x80 : 0x00),

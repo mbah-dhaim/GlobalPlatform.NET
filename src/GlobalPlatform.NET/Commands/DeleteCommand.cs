@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
+using GlobalPlatform.NET.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,20 +159,20 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override Apdu AsApdu()
+        public override CommandApdu AsApdu()
         {
-            var apdu = Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Delete, this.P1, this.P2, 0x00);
+            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.Delete, this.P1, this.P2, 0x00);
 
             var data = new List<byte>();
 
             switch (this.scope)
             {
                 case DeleteCommandScope.CardContent:
-                    data.AddTag((byte)Tag.ExecutableLoadFileOrApplicationAID, this.application);
+                    data.AddTLV(TLV.Build((byte)Tag.ExecutableLoadFileOrApplicationAID, this.application));
 
                     if (this.token.Any())
                     {
-                        data.AddTag((byte)Tag.DeleteToken, this.token);
+                        data.AddTLV(TLV.Build((byte)Tag.DeleteToken, this.token));
                     }
                     break;
 
@@ -182,11 +183,11 @@ namespace GlobalPlatform.NET.Commands
                     }
                     if (this.keyIdentifier > 0)
                     {
-                        data.AddTag((byte)Tag.KeyIdentifier, this.keyIdentifier);
+                        data.AddTLV(TLV.Build((byte)Tag.KeyIdentifier, this.keyIdentifier));
                     }
                     if (this.keyVersionNumber > 0)
                     {
-                        data.AddTag((byte)Tag.KeyVersionNumber, this.keyVersionNumber);
+                        data.AddTLV(TLV.Build((byte)Tag.KeyVersionNumber, this.keyVersionNumber));
                     }
                     break;
             }

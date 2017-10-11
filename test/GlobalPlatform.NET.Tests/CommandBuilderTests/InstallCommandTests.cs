@@ -79,33 +79,6 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
         }
 
         [TestMethod]
-        public void Install_For_Load_For_Install()
-        {
-            var apdus = InstallCommand.Build
-                .ForLoad()
-                .Load(ExecutableLoadFileAID)
-                .ToSecurityDomain(SecurityDomainAID)
-                .WithDataBlockHash(Hash)
-                .WithParameters(InstallParameters)
-                .WithToken(Token)
-
-                .ForInstall()
-                .FromLoadFile(ExecutableLoadFileAID)
-                .InstallModule(ExecutableModuleAID)
-                .As(ApplicationAID)
-                .WithPrivileges(Privileges.Empty)
-                .WithParameters(InstallParameters)
-                .WithToken(Token)
-
-                .AsApdus()
-                .ToList();
-
-            apdus.Count.Should().Be(2);
-            apdus.Skip(0).First().Assert(ApduInstruction.Install, 0x02, 0x80);
-            apdus.Skip(1).First().Assert(ApduInstruction.Install, 0x04, 0x00);
-        }
-
-        [TestMethod]
         public void Install_For_MakeSelectable()
         {
             var apdu = InstallCommand.Build
@@ -136,43 +109,10 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithParameters(InstallParameters)
                 .WithToken(Token)
 
-                .ForInstall()
+                .ForInstallAndMakeSelectable()
                 .FromLoadFile(ExecutableLoadFileAID)
                 .InstallModule(ExecutableModuleAID)
                 .As(ApplicationAID)
-                .WithPrivileges(Privileges.Empty)
-                .WithParameters(InstallParameters)
-                .WithToken(Token)
-
-                .ForMakeSelectable()
-                .ChangeApplication(ApplicationAID)
-                .WithPrivileges(Privileges.Empty)
-                .WithParameters(InstallParameters)
-                .WithToken(Token)
-
-                .AsApdus()
-                .ToList();
-
-            apdus.Count.Should().Be(3);
-            apdus.Skip(0).First().Assert(ApduInstruction.Install, 0x02, 0x80);
-            apdus.Skip(1).First().Assert(ApduInstruction.Install, 0x04, 0x80);
-            apdus.Skip(2).First().Assert(ApduInstruction.Install, 0x08, 0x00);
-        }
-
-        [TestMethod]
-        public void Install_For_Install_For_Make_Selectable()
-        {
-            var apdus = InstallCommand.Build
-                .ForInstall()
-                .FromLoadFile(ExecutableLoadFileAID)
-                .InstallModule(ExecutableModuleAID)
-                .As(ApplicationAID)
-                .WithPrivileges(Privileges.Empty)
-                .WithParameters(InstallParameters)
-                .WithToken(Token)
-
-                .ForMakeSelectable()
-                .ChangeApplication(ApplicationAID)
                 .WithPrivileges(Privileges.Empty)
                 .WithParameters(InstallParameters)
                 .WithToken(Token)
@@ -181,8 +121,24 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .ToList();
 
             apdus.Count.Should().Be(2);
-            apdus.Skip(0).First().Assert(ApduInstruction.Install, 0x04, 0x80);
-            apdus.Skip(1).First().Assert(ApduInstruction.Install, 0x08, 0x00);
+            apdus.Skip(0).First().Assert(ApduInstruction.Install, 0x0E, 0x01);
+            apdus.Skip(1).First().Assert(ApduInstruction.Install, 0x0E, 0x03);
+        }
+
+        [TestMethod]
+        public void Install_For_Install_For_Make_Selectable()
+        {
+            var apdu = InstallCommand.Build
+                .ForInstallAndMakeSelectable()
+                .FromLoadFile(ExecutableLoadFileAID)
+                .InstallModule(ExecutableModuleAID)
+                .As(ApplicationAID)
+                .WithPrivileges(Privileges.Empty)
+                .WithParameters(InstallParameters)
+                .WithToken(Token)
+                .AsApdu();
+
+            apdu.Assert(ApduInstruction.Install, 0x0C, 0x00);
         }
 
         [TestMethod]

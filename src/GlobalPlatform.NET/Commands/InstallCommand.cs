@@ -11,6 +11,7 @@ namespace GlobalPlatform.NET.Commands
     public interface IInstallCommandForPicker : IInstallCommandForLoadPicker,
         IInstallCommandForInstallPicker,
         IInstallCommandForMakeSelectablePicker,
+        IInstallCommandForInstallAndMakeSelectablePicker,
         IInstallCommandForExtraditionPicker,
         IInstallCommandForRegistryUpdatePicker,
         IInstallCommandForPersonalizationPicker
@@ -47,7 +48,7 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForLoadBuilder WithToken(byte[] token);
     }
 
-    public interface IInstallCommandForLoadBuilder : IInstallCommandForInstallPicker, IApduBuilder
+    public interface IInstallCommandForLoadBuilder : IInstallCommandForInstallAndMakeSelectablePicker, IApduBuilder
     {
     }
 
@@ -121,6 +122,47 @@ namespace GlobalPlatform.NET.Commands
     }
 
     public interface IInstallCommandForMakeSelectableBuilder : IApduBuilder, IMultiApduBuilder
+    {
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectablePicker
+    {
+        IInstallCommandForInstallAndMakeSelectableExecutableLoadFilePicker ForInstallAndMakeSelectable();
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableExecutableLoadFilePicker
+    {
+        IInstallCommandForInstallAndMakeSelectableExecutableModulePicker FromLoadFile(byte[] loadFileAID);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableExecutableModulePicker
+    {
+        IInstallCommandForInstallAndMakeSelectableApplicationPicker InstallModule(byte[] moduleAID);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableApplicationPicker
+    {
+        IInstallCommandForInstallAndMakeSelectablePrivilegesPicker As(byte[] applicationAID);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectablePrivilegesPicker
+    {
+        IInstallCommandForInstallAndMakeSelectableParametersPicker WithPrivileges(Privileges privileges);
+
+        IInstallCommandForInstallAndMakeSelectableParametersPicker WithPrivileges(byte[] privileges);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableParametersPicker : IInstallCommandForInstallAndMakeSelectableTokenPicker
+    {
+        IInstallCommandForInstallAndMakeSelectableTokenPicker WithParameters(byte[] parameters);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableTokenPicker : IInstallCommandForInstallAndMakeSelectableBuilder
+    {
+        IInstallCommandForInstallAndMakeSelectableBuilder WithToken(byte[] token);
+    }
+
+    public interface IInstallCommandForInstallAndMakeSelectableBuilder : IApduBuilder, IMultiApduBuilder
     {
     }
 
@@ -213,6 +255,11 @@ namespace GlobalPlatform.NET.Commands
         IInstallCommandForMakeSelectablePrivilegesPicker,
         IInstallCommandForMakeSelectableParametersPicker,
         IInstallCommandForMakeSelectableBuilder,
+        IInstallCommandForInstallAndMakeSelectableExecutableLoadFilePicker,
+        IInstallCommandForInstallAndMakeSelectableExecutableModulePicker,
+        IInstallCommandForInstallAndMakeSelectableApplicationPicker,
+        IInstallCommandForInstallAndMakeSelectablePrivilegesPicker,
+        IInstallCommandForInstallAndMakeSelectableParametersPicker,
         IInstallCommandForExtraditionApplicationPicker,
         IInstallCommandForExtraditionSecurityDomainPicker,
         IInstallCommandForExtraditionParametersPicker,
@@ -225,6 +272,7 @@ namespace GlobalPlatform.NET.Commands
         private const byte forLoad = 0b00000010;
         private const byte forInstall = 0b00000100;
         private const byte forMakeSelectable = 0b00001000;
+        private const byte forInstallAndMakeSelectable = 0b00001100;
         private const byte forExtradition = 0b00010000;
         private const byte forRegistryUpdate = 0b01000000;
         private const byte forPersonalization = 0b00100000;
@@ -308,6 +356,71 @@ namespace GlobalPlatform.NET.Commands
             Ensure.IsNotNull(token, nameof(token));
 
             this.forLoadToken = token;
+
+            return this;
+        }
+
+        public IInstallCommandForInstallAndMakeSelectableExecutableLoadFilePicker ForInstallAndMakeSelectable()
+        {
+            this.P1 |= forInstall;
+            this.P1 |= forMakeSelectable;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectableExecutableModulePicker IInstallCommandForInstallAndMakeSelectableExecutableLoadFilePicker.FromLoadFile(byte[] loadFileAID)
+        {
+            Ensure.IsAID(loadFileAID, nameof(loadFileAID));
+
+            this.forInstallExecutableLoadFileAID = loadFileAID;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectableApplicationPicker IInstallCommandForInstallAndMakeSelectableExecutableModulePicker.InstallModule(byte[] moduleAID)
+        {
+            Ensure.IsAID(moduleAID, nameof(moduleAID));
+
+            this.forInstallExecutableModuleAID = moduleAID;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectablePrivilegesPicker IInstallCommandForInstallAndMakeSelectableApplicationPicker.As(byte[] applicationAID)
+        {
+            Ensure.IsAID(applicationAID, nameof(applicationAID));
+
+            this.forInstallApplicationAID = applicationAID;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectableParametersPicker IInstallCommandForInstallAndMakeSelectablePrivilegesPicker.WithPrivileges(Privileges privileges)
+            => (this as IInstallCommandForInstallAndMakeSelectablePrivilegesPicker).WithPrivileges(privileges.AsBytes());
+
+        IInstallCommandForInstallAndMakeSelectableParametersPicker IInstallCommandForInstallAndMakeSelectablePrivilegesPicker.WithPrivileges(byte[] privileges)
+        {
+            Ensure.HasCount(privileges, nameof(privileges), 1, 3);
+
+            this.forInstallPrivileges = privileges;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectableTokenPicker IInstallCommandForInstallAndMakeSelectableParametersPicker.WithParameters(byte[] parameters)
+        {
+            Ensure.HasAtLeast(parameters, nameof(parameters), 2);
+
+            this.forInstallParameters = parameters;
+
+            return this;
+        }
+
+        IInstallCommandForInstallAndMakeSelectableBuilder IInstallCommandForInstallAndMakeSelectableTokenPicker.WithToken(byte[] token)
+        {
+            Ensure.IsNotNull(token, nameof(token));
+
+            this.forInstallToken = token;
 
             return this;
         }
@@ -546,7 +659,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public Apdu AsApdu()
+        public CommandApdu AsApdu()
         {
             switch (this.P1)
             {
@@ -558,6 +671,9 @@ namespace GlobalPlatform.NET.Commands
 
                 case forMakeSelectable:
                     return this.BuildForMakeSelectable();
+
+                case forInstallAndMakeSelectable:
+                    return this.BuildForInstallAndMakeSelectable();
 
                 case forExtradition:
                     return this.BuildForExtradition();
@@ -573,36 +689,49 @@ namespace GlobalPlatform.NET.Commands
             }
         }
 
-        public byte[] AsBytes() => this.AsApdu().Buffer;
+        public new byte[] AsBytes() => this.AsApdu().Buffer;
 
-        public override IEnumerable<Apdu> AsApdus()
+        public override IEnumerable<CommandApdu> AsApdus()
         {
-            bool HasOption(byte option)
+            if (this.HasOption(forLoad))
             {
-                return (this.P1 & option) == option;
+                yield return this.BuildForLoad();
             }
 
-            if (HasOption(forLoad))
+            if (this.HasOption(forInstall) && this.HasOption(forMakeSelectable))
             {
-                bool moreCommands = HasOption(forInstall);
+                yield return this.BuildForInstallAndMakeSelectable();
+            }
+            else
+            {
+                if (this.HasOption(forInstall))
+                {
+                    yield return this.BuildForInstall();
+                }
 
-                yield return this.BuildForLoad(moreCommands);
+                if (this.HasOption(forMakeSelectable))
+                {
+                    yield return this.BuildForMakeSelectable();
+                }
             }
 
-            if (HasOption(forInstall))
+            if (this.HasOption(forExtradition))
             {
-                bool moreCommands = HasOption(forMakeSelectable);
-
-                yield return this.BuildForInstall(moreCommands);
+                yield return this.BuildForExtradition();
             }
 
-            if (HasOption(forMakeSelectable))
+            if (this.HasOption(forRegistryUpdate))
             {
-                yield return this.BuildForMakeSelectable();
+                yield return this.BuildForRegistryUpdate();
+            }
+
+            if (this.HasOption(forPersonalization))
+            {
+                yield return this.BuildForPersonalization();
             }
         }
 
-        private Apdu BuildForLoad(bool moreCommands = false)
+        private CommandApdu BuildForLoad()
         {
             var commandData = new List<byte>();
 
@@ -612,10 +741,12 @@ namespace GlobalPlatform.NET.Commands
             commandData.AddRangeWithLength(this.forLoadParameters);
             commandData.AddRangeWithLength(this.forLoadToken);
 
-            return this.Build(forLoad, commandData, moreCommands);
+            byte p2 = (byte)(this.HasOption(forInstall) && this.HasOption(forMakeSelectable) ? 0x01 : 0x00);
+
+            return this.Build(commandData, p2);
         }
 
-        private Apdu BuildForInstall(bool moreCommands = false)
+        private CommandApdu BuildForInstall()
         {
             var commandData = new List<byte>();
 
@@ -626,10 +757,10 @@ namespace GlobalPlatform.NET.Commands
             commandData.AddRangeWithLength(this.forInstallParameters);
             commandData.AddRangeWithLength(this.forInstallToken);
 
-            return this.Build(forInstall, commandData, moreCommands);
+            return this.Build(commandData);
         }
 
-        private Apdu BuildForMakeSelectable()
+        private CommandApdu BuildForMakeSelectable()
         {
             var commandData = new List<byte> { 0x00, 0x00 };
 
@@ -638,10 +769,26 @@ namespace GlobalPlatform.NET.Commands
             commandData.AddRangeWithLength(this.forMakeSelectableParameters);
             commandData.AddRangeWithLength(this.forMakeSelectableToken);
 
-            return this.Build(forMakeSelectable, commandData);
+            return this.Build(commandData);
         }
 
-        private Apdu BuildForExtradition()
+        private CommandApdu BuildForInstallAndMakeSelectable()
+        {
+            var commandData = new List<byte>();
+
+            commandData.AddRangeWithLength(this.forInstallExecutableLoadFileAID);
+            commandData.AddRangeWithLength(this.forInstallExecutableModuleAID);
+            commandData.AddRangeWithLength(this.forInstallApplicationAID);
+            commandData.AddRangeWithLength(this.forInstallPrivileges);
+            commandData.AddRangeWithLength(this.forInstallParameters);
+            commandData.AddRangeWithLength(this.forInstallToken);
+
+            byte p2 = (byte)(this.HasOption(forLoad) ? 0x03 : 0x00);
+
+            return this.Build(commandData, p2);
+        }
+
+        private CommandApdu BuildForExtradition()
         {
             var commandData = new List<byte>();
 
@@ -652,10 +799,10 @@ namespace GlobalPlatform.NET.Commands
             commandData.AddRangeWithLength(this.forExtraditionParameters);
             commandData.AddRangeWithLength(this.forExtraditionToken);
 
-            return this.Build(forExtradition, commandData);
+            return this.Build(commandData);
         }
 
-        private Apdu BuildForRegistryUpdate()
+        private CommandApdu BuildForRegistryUpdate()
         {
             var commandData = new List<byte>();
 
@@ -665,10 +812,10 @@ namespace GlobalPlatform.NET.Commands
             commandData.AddRangeWithLength(this.forRegistryUpdateParameters);
             commandData.AddRangeWithLength(this.forRegistryUpdateToken);
 
-            return this.Build(forRegistryUpdate, commandData);
+            return this.Build(commandData);
         }
 
-        private Apdu BuildForPersonalization()
+        private CommandApdu BuildForPersonalization()
         {
             var commandData = new List<byte> { 0x00, 0x00 };
 
@@ -677,14 +824,17 @@ namespace GlobalPlatform.NET.Commands
             commandData.Add(0x00);
             commandData.Add(0x00);
 
-            return this.Build(forPersonalization, commandData);
+            return this.Build(commandData);
         }
 
-        private Apdu Build(byte p1, IEnumerable<byte> commandData, bool moreCommands = false)
+        private new CommandApdu Build(IEnumerable<byte> commandData, byte p2 = 0x00)
         {
-            byte p2 = moreCommands ? (byte)0x80 : (byte)0x00;
+            return CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.Install, this.P1, p2, commandData.ToArray(), 0x00);
+        }
 
-            return Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.Install, p1, p2, commandData.ToArray(), 0x00);
+        private bool HasOption(byte option)
+        {
+            return (this.P1 & option) == option;
         }
     }
 }

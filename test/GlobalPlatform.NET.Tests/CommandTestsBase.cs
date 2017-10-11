@@ -28,7 +28,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="ins"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduInstruction ins,
             byte p1,
             byte p2)
@@ -47,7 +47,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="ins"></param>
         /// <param name="p1"></param>
         /// <param name="p2"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduClass cla,
             ApduInstruction ins,
             byte p1,
@@ -67,7 +67,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="le"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduInstruction ins,
             byte p1,
             byte p2,
@@ -88,7 +88,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="le"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduClass cla,
             ApduInstruction ins,
             byte p1,
@@ -108,7 +108,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="commandData"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduInstruction ins,
             byte p1,
             byte p2,
@@ -130,7 +130,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="commandData"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduInstruction ins,
             byte p1,
             byte p2,
@@ -154,7 +154,7 @@ namespace GlobalPlatform.NET.Tests
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <param name="commandData"></param>
-        public static void Assert(this Apdu apdu,
+        public static void Assert(this CommandApdu apdu,
             ApduClass cla,
             ApduInstruction ins,
             byte p1,

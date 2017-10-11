@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GlobalPlatform.NET.Reference;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 {
@@ -30,7 +31,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             if (BitConverter.IsLittleEndian)
             {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
+                Array.Reverse(loadFileDataBlockLength);
             }
 
             commandData.AddRange(loadFileDataBlockLength);
@@ -61,27 +62,15 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .AsApdus()
                 .ToList();
 
-            var commandData = new List<byte>();
+            var tlvs = TLV.Parse(apdus.First().CommandData);
 
-            var signatureData = new List<byte>();
-            signatureData.AddTag((byte)Tag.SecurityDomainAID, SecurityDomainAID);
-            signatureData.AddTag((byte)Tag.LoadFileDataBlockSignature, Signature);
-
-            commandData.AddTag((byte)Tag.DapBlock, signatureData.ToArray());
-
-            commandData.Add((byte)Tag.LoadFileDataBlock);
-            commandData.Add(0x82);
-
-            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)data.Length);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                loadFileDataBlockLength = loadFileDataBlockLength.Reverse().ToArray();
-            }
-
-            commandData.AddRange(loadFileDataBlockLength);
-
-            apdus.First().CommandData.Take(22).ShouldBeEquivalentTo(commandData);
+            tlvs.Count.Should().Be(2);
+            tlvs.First().Tag.ShouldAllBeEquivalentTo((byte)Tag.DapBlock);
+            tlvs.Single((byte)Tag.DapBlock).NestedTags.Count.Should().Be(2);
+            tlvs.Single((byte)Tag.DapBlock).NestedTags.First().Tag.ShouldAllBeEquivalentTo((byte)Tag.SecurityDomainAID);
+            tlvs.Single((byte)Tag.DapBlock).NestedTags.Last().Tag.ShouldAllBeEquivalentTo((byte)Tag.LoadFileDataBlockSignature);
+            tlvs.Last().Tag.ShouldAllBeEquivalentTo((byte)Tag.LoadFileDataBlock);
+            tlvs.Single((byte)Tag.LoadFileDataBlock).NestedTags.Count.Should().Be(0);
 
             byte[] dataBlock = apdus.SelectMany(apdu => apdu.CommandData).ToArray();
 
@@ -95,3 +84,4 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
         }
     }
 }
+

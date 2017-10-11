@@ -80,7 +80,7 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public override IEnumerable<Apdu> AsApdus()
+        public override IEnumerable<CommandApdu> AsApdus()
         {
             var chunks = this.data.Split(this.blockSize).ToList();
 
@@ -91,7 +91,7 @@ namespace GlobalPlatform.NET.Commands
                     this.P1 ^= 0x80;
                 }
 
-                return Apdu.Build(
+                return CommandApdu.Case3S(
                     ApduClass.GlobalPlatform,
                     ApduInstruction.StoreData,
                     this.P1,

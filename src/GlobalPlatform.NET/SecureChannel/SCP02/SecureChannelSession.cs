@@ -87,12 +87,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public byte[] HostCryptogram { get; private set; }
 
-        /// <summary>
-        /// Based on section E.1.5 of the v2.3 GlobalPlatform Card Specification. 
-        /// </summary>
-        /// <param name="apdu"></param>
-        /// <returns></returns>
-        public Apdu SecureApdu(Apdu apdu)
+        public CommandApdu SecureApdu(CommandApdu apdu)
         {
             if (apdu.CLA != ApduClass.GlobalPlatform)
             {
@@ -121,12 +116,12 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             // If bit 1 is set, the current security level requires the use of command encryption.
             if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
             {
-                byte[] commandData = apdu.CommandData.Take(apdu.CommandData.Length - 8).ToArray();
-                byte[] mac = apdu.CommandData.TakeLast(8).ToArray();
+                var commandData = apdu.CommandData.Take(apdu.CommandData.Length - 8);
+                var mac = apdu.CommandData.TakeLast(8);
 
-                byte[] padded = commandData.ToList().Pad().ToArray();
+                var padded = commandData.ToList().Pad();
 
-                byte[] encrypted = TripleDES.Encrypt(padded, this.EncryptionKey);
+                byte[] encrypted = TripleDES.Encrypt(padded.ToArray(), this.EncryptionKey);
 
                 var data = new List<byte>();
                 data.AddRange(encrypted);
@@ -138,7 +133,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return apdu;
         }
 
-        internal byte[] GenerateCmac(Apdu apdu)
+        internal byte[] GenerateCmac(CommandApdu apdu)
         {
             byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : DES.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
 
@@ -157,7 +152,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         /// </summary>
         /// <param name="apdu"></param>
         /// <returns></returns>
-        internal static byte[] GetDataForCmac(Apdu apdu)
+        internal static byte[] GetDataForCmac(CommandApdu apdu)
         {
             var apduData = new List<byte> { (byte)apdu.CLA, (byte)apdu.INS, apdu.P1, apdu.P2 };
 
@@ -171,10 +166,10 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return padded;
         }
 
-        public IEnumerable<Apdu> SecureApdu(params Apdu[] apdus)
+        public IEnumerable<CommandApdu> SecureApdu(params CommandApdu[] apdus)
             => apdus.Select(this.SecureApdu);
 
-        public IEnumerable<Apdu> SecureApdu(IEnumerable<Apdu> apdus)
+        public IEnumerable<CommandApdu> SecureApdu(IEnumerable<CommandApdu> apdus)
             => this.SecureApdu(apdus.ToArray());
 
         public IScp02SecurityLevelPicker UsingOption15()

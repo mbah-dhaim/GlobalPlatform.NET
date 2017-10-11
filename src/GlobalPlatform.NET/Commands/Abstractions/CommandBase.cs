@@ -14,7 +14,7 @@ namespace GlobalPlatform.NET.Commands.Abstractions
         /// </summary>
         public static TBuilder Build => new TCommand();
 
-        public abstract Apdu AsApdu();
+        public abstract CommandApdu AsApdu();
 
         public byte[] AsBytes() => this.AsApdu().Buffer;
     }

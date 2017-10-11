@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
+using GlobalPlatform.NET.Tools;
 using System.Collections.Generic;
 
 namespace GlobalPlatform.NET.Commands
@@ -24,16 +25,11 @@ namespace GlobalPlatform.NET.Commands
         IGetStatusOccurrencePicker WithFilter(byte[] applicationFilter);
     }
 
-    public interface IGetStatusOccurrencePicker : IGetStatusResponseFormatPicker
+    public interface IGetStatusOccurrencePicker : IApduBuilder
     {
-        IGetStatusResponseFormatPicker ReturnFirstOrAllOccurrences();
+        IApduBuilder ReturnFirstOrAllOccurrences();
 
-        IGetStatusResponseFormatPicker ReturnNextOccurrence();
-    }
-
-    public interface IGetStatusResponseFormatPicker : IApduBuilder
-    {
-        IApduBuilder InAlternateFormat();
+        IApduBuilder ReturnNextOccurrence();
     }
 
     /// <summary>
@@ -44,15 +40,13 @@ namespace GlobalPlatform.NET.Commands
     /// </summary>
     public class GetStatusCommand : CommandBase<GetStatusCommand, IGetStatusScopePicker>,
         IGetStatusScopePicker,
-        IGetStatusApplicationFilter,
-        IGetStatusOccurrencePicker,
-        IGetStatusResponseFormatPicker
+        IGetStatusApplicationFilter
     {
         private byte[] applicationFilter = new byte[0];
 
         public enum Tag : byte
         {
-            ApplicationAID = 0x4F,
+            ApplicationAID = 0x4F
         }
 
         public IGetStatusApplicationFilter GetStatusOf(GetStatusScope scope)
@@ -71,29 +65,22 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public IGetStatusResponseFormatPicker ReturnFirstOrAllOccurrences() => this;
+        public IApduBuilder ReturnFirstOrAllOccurrences() => this;
 
-        public IGetStatusResponseFormatPicker ReturnNextOccurrence()
+        public IApduBuilder ReturnNextOccurrence()
         {
             this.P2 |= 0b00000001;
 
             return this;
         }
 
-        public IApduBuilder InAlternateFormat()
+        public override CommandApdu AsApdu()
         {
-            this.P2 |= 0b00000010;
-
-            return this;
-        }
-
-        public override Apdu AsApdu()
-        {
-            var apdu = Apdu.Build(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, this.P1, this.P2, 0x00);
+            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, this.P1, this.P2 |= 0b00000010, 0x00);
 
             var data = new List<byte>();
 
-            data.AddTag((byte)Tag.ApplicationAID, this.applicationFilter);
+            data.AddTLV(TLV.Build((byte)Tag.ApplicationAID, this.applicationFilter));
 
             apdu.CommandData = data.ToArray();
 
