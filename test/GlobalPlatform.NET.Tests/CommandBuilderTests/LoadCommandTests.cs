@@ -44,7 +44,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             {
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
-                apdu.Assert(ApduInstruction.Load, p1, (byte)index);
+                apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
                 apdu.Lc.Should().Be((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }
@@ -91,7 +91,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             {
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
-                apdu.Assert(ApduInstruction.Load, p1, (byte)index);
+                apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
                 apdu.Lc.Should().Be((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }

@@ -15,7 +15,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithTagList(0x5C, 0x00)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetData, 0x2F, 0x00, 0x5C, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetData, 0x2F, 0x00, 0x5C, 0x00);
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .GetDataFrom(DataObject.KeyInformationTemplate)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetData, 0x00, 0xE0, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetData, 0x00, 0xE0, 0x00);
         }
     }
 }

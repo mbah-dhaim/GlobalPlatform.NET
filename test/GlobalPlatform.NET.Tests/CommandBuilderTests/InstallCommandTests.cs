@@ -29,7 +29,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x02, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x02, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x02, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x02, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x04, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x04, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -95,7 +95,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x08, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x08, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -121,8 +121,8 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .ToList();
 
             apdus.Count.Should().Be(2);
-            apdus.Skip(0).First().Assert(ApduInstruction.Install, 0x0E, 0x01);
-            apdus.Skip(1).First().Assert(ApduInstruction.Install, 0x0E, 0x03);
+            apdus.Skip(0).First().Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x0E, 0x01);
+            apdus.Skip(1).First().Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x0E, 0x03);
         }
 
         [TestMethod]
@@ -138,7 +138,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithToken(Token)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Install, 0x0C, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x0C, 0x00);
         }
 
         [TestMethod]
@@ -160,7 +160,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x10, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x10, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -182,7 +182,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.AddRangeWithLength(InstallParameters);
             commandData.AddRangeWithLength(Token);
 
-            apdu.Assert(ApduInstruction.Install, 0x40, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x40, 0x00, commandData.ToArray(), 0x00);
         }
 
         [TestMethod]
@@ -199,7 +199,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             commandData.Add(0x00);
             commandData.Add(0x00);
 
-            apdu.Assert(ApduInstruction.Install, 0x20, 0x00, commandData.ToArray());
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Install, 0x20, 0x00, commandData.ToArray(), 0x00);
         }
     }
 }

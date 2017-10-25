@@ -15,7 +15,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithAID(ApplicationAID)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x00, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x00, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
         }
 
         [TestMethod]
@@ -27,7 +27,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .AndRelatedObjects()
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x80, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x80, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
         }
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .UsingToken(Token)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x80, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x9E, 0x04, 0x11, 0x11, 0x11, 0x11);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x80, 0x4F, 0x08, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x9E, 0x04, 0x11, 0x11, 0x11, 0x11);
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithVersionNumber(0x6F)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x00, 0xD2, 0x01, 0x6F);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x00, 0xD2, 0x01, 0x6F);
         }
 
         [TestMethod]
@@ -62,7 +62,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithIdentifier(0x0F)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x00, 0xD0, 0x01, 0x0F);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x00, 0xD0, 0x01, 0x0F);
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithIdentifier(0x0F)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.Delete, 0x00, 0x00, 0xD0, 0x01, 0x0F, 0xD2, 0x01, 0x6F);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Delete, 0x00, 0x00, 0xD0, 0x01, 0x0F, 0xD2, 0x01, 0x6F);
         }
     }
 }

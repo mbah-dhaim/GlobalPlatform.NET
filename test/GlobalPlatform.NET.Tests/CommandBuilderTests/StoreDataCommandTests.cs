@@ -29,7 +29,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             {
                 byte expectedP1 = isLast ? p1 |= 0x80 : p1;
 
-                apdu.Assert(ApduInstruction.StoreData, expectedP1, (byte)index);
+                apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.StoreData, expectedP1, (byte)index);
                 apdu.CommandData.All(x => x == 0x00).Should().BeTrue();
             });
         }

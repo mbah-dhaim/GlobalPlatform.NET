@@ -15,7 +15,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .To(CardLifeCycleCoding.Initialized)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.SetStatus, 0x80, 0x07);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, 0x80, 0x07);
         }
 
         [TestMethod]
@@ -27,7 +27,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .For(ApplicationAID)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.SetStatus, 0x40, 0x0F, ApplicationAID, new byte[0]);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, 0x40, 0x0F, ApplicationAID);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .For(ApplicationAID)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.SetStatus, 0x60, 0x07, ApplicationAID, new byte[0]);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.SetStatus, 0x60, 0x07, ApplicationAID);
         }
     }
 }

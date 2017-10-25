@@ -14,7 +14,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .GetStatusOf(GetStatusScope.IssuerSecurityDomain)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetStatus, 0x80, 0x02, 0x4F, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, 0x80, 0x02, 0x4F, 0x00);
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithFilter(new byte[] { 0xA0, 0x00 })
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetStatus, 0x10, 0x02, 0x4F, 0x02, 0xA0, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, 0x10, 0x02, 0x4F, 0x02, 0xA0, 0x00);
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .ReturnNextOccurrence()
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetStatus, 0x80, 0x03, 0x4F, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, 0x80, 0x03, 0x4F, 0x00);
         }
     }
 }

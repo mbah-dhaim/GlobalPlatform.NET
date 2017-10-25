@@ -14,7 +14,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .OpenChannel()
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.ManageChannel, 0x00, 0x00, 0x01);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, 0x00, 0x00, 0x01);
         }
 
         [TestMethod]
@@ -25,7 +25,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .WithIdentifier(0x01)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.ManageChannel, 0x80, 0x01);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.ManageChannel, 0x80, 0x01);
         }
     }
 }

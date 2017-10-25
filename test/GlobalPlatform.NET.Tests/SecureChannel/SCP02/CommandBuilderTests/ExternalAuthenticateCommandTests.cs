@@ -19,7 +19,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .UsingHostCryptogram(hostCryptogram)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.ExternalAuthenticate, (byte)securityLevel, 0x00, hostCryptogram, new byte[0]);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.ExternalAuthenticate, (byte)securityLevel, 0x00, hostCryptogram);
         }
     }
 }

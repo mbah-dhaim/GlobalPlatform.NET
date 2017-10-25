@@ -29,7 +29,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 .PutThirdKey(KeyTypeCoding.DES, KeyData)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.PutKey, keyVersion, keyIdentifier);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.PutKey, keyVersion, keyIdentifier, 0x00);
 
             apdu.Lc.Should().Be(1 + 3 * 22);
             apdu.CommandData.First().Should().Be(keyVersion);
