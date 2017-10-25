@@ -68,20 +68,7 @@ namespace GlobalPlatform.NET.Commands
                 commandData.AddTLV(dapBlock);
             }
 
-            commandData.Add((byte)Tag.LoadFileDataBlock);
-
-            // Length encoded on 2 further bytes, according to ASN.1
-            commandData.Add(0x82);
-
-            var loadFileDataBlockLength = BitConverter.GetBytes((ushort)this.data.Length);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(loadFileDataBlockLength);
-            }
-
-            commandData.AddRange(loadFileDataBlockLength);
-            commandData.AddRange(this.data);
+            commandData.AddTLV(TLV.Build((byte)Tag.LoadFileDataBlock, this.data));
 
             var chunks = commandData.Split(this.blockSize).ToList();
 

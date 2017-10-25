@@ -1,10 +1,51 @@
-﻿using GlobalPlatform.NET.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace GlobalPlatform.NET.Tools
 {
-    public static class GetStatusResponse
+    public interface IGetStatusResponseOperationPicker
+    {
+        IGetStatusResponseScopePicker WithScopeOf();
+    }
+
+    public interface IGetStatusResponseScopePicker
+    {
+        IGetStatusResponseIssuerSecurityDomainParser IssuerSecurityDomain();
+
+        IGetStatusResponseApplicationsParser Applications();
+
+        IGetStatusResponseExecutableLoadFilesParser ExecutableLoadFiles();
+    }
+
+    public interface IGetStatusResponseIssuerSecurityDomainParser
+    {
+        ApplicationData Parse(IEnumerable<byte> apdu);
+    }
+
+    public interface IGetStatusResponseApplicationsParser
+    {
+        IEnumerable<ApplicationData> Parse(params IEnumerable<byte>[] apdus);
+    }
+
+    public interface IGetStatusResponseExecutableLoadFilesParser
+    {
+        IEnumerable<ExecutableLoadFileData> Parse(params IEnumerable<byte>[] apdus);
+    }
+
+    /// <summary>
+    /// The GET STATUS command is used to retrieve Issuer Security Domain, Executable Load File,
+    /// Executable Module, Application or Security Domain Life Cycle status information according to
+    /// a given match/search criteria.
+    /// <para>
+    /// Here you can analyze the responses to return structured data objects, for further interrogation.
+    /// </para>
+    /// <para> Based on section 11.4.3 of the v2.3 GlobalPlatform Card Specification. </para>
+    /// </summary>
+    public class GetStatusResponse : IGetStatusResponseOperationPicker,
+        IGetStatusResponseScopePicker,
+        IGetStatusResponseIssuerSecurityDomainParser,
+        IGetStatusResponseApplicationsParser,
+        IGetStatusResponseExecutableLoadFilesParser
     {
         private static class Tag
         {
@@ -18,11 +59,24 @@ namespace GlobalPlatform.NET.Tools
             public const byte GlobalPlatformRegistry = 0xE3;
         }
 
-        public static ApplicationData ParseIssuerSecurityDomain(IList<byte> apdu)
-            => ParseApplications(apdu).Single();
+        /// <summary>
+        /// Starts analyzing the response. 
+        /// </summary>
+        public static IGetStatusResponseOperationPicker Analyze => new GetStatusResponse();
 
-        public static IEnumerable<ApplicationData> ParseApplications(params IList<byte>[] apdus)
-            => TLV.Parse(apdus.SelectMany(x => x).ToList())
+        public IGetStatusResponseScopePicker WithScopeOf() => this;
+
+        public IGetStatusResponseIssuerSecurityDomainParser IssuerSecurityDomain() => this;
+
+        public IGetStatusResponseApplicationsParser Applications() => this;
+
+        public IGetStatusResponseExecutableLoadFilesParser ExecutableLoadFiles() => this;
+
+        ApplicationData IGetStatusResponseIssuerSecurityDomainParser.Parse(IEnumerable<byte> apdu)
+            => ((IGetStatusResponseApplicationsParser)this).Parse(apdu).Single();
+
+        IEnumerable<ApplicationData> IGetStatusResponseApplicationsParser.Parse(params IEnumerable<byte>[] apdus)
+            => TLV.Parse(apdus.SelectMany(x => x))
                 .Where(Tag.GlobalPlatformRegistry)
                 .Select(tlv => new ApplicationData
                 {
@@ -33,8 +87,8 @@ namespace GlobalPlatform.NET.Tools
                     AssociatedSecurityDomainAID = tlv.NestedTags.SingleOrDefault(Tag.AssociatedSecurityDomainAID)?.Value.ToArray(),
                 });
 
-        public static IEnumerable<ExecutableLoadFileData> ParseExecutableLoadFiles(params IList<byte>[] apdus)
-            => TLV.Parse(apdus.SelectMany(x => x).ToList())
+        IEnumerable<ExecutableLoadFileData> IGetStatusResponseExecutableLoadFilesParser.Parse(params IEnumerable<byte>[] apdus)
+            => TLV.Parse(apdus.SelectMany(x => x))
                 .Select(tlv => new ExecutableLoadFileData
                 {
                     AID = tlv.NestedTags.Single(Tag.AID).Value.ToArray(),
@@ -47,27 +101,27 @@ namespace GlobalPlatform.NET.Tools
 
     public class ApplicationData
     {
-        public byte[] AID { get; set; }
+        public byte[] AID { get; internal set; }
 
-        public byte LifeCycleState { get; set; }
+        public byte LifeCycleState { get; internal set; }
 
-        public byte[] Privileges { get; set; }
+        public byte[] Privileges { get; internal set; }
 
-        public byte[] ExecutableLoadFileAID { get; set; }
+        public byte[] ExecutableLoadFileAID { get; internal set; }
 
-        public byte[] AssociatedSecurityDomainAID { get; set; }
+        public byte[] AssociatedSecurityDomainAID { get; internal set; }
     }
 
     public class ExecutableLoadFileData
     {
-        public byte[] AID { get; set; }
+        public byte[] AID { get; internal set; }
 
-        public byte LifeCycleState { get; set; }
+        public byte LifeCycleState { get; internal set; }
 
-        public byte[] ExecutableLoadFileVersionNumber { get; set; }
+        public byte[] ExecutableLoadFileVersionNumber { get; internal set; }
 
-        public IReadOnlyCollection<byte[]> ExecutableModuleAIDs { get; set; }
+        public IReadOnlyCollection<byte[]> ExecutableModuleAIDs { get; internal set; }
 
-        public byte[] AssociatedSecurityDomainAID { get; set; }
+        public byte[] AssociatedSecurityDomainAID { get; internal set; }
     }
 }
