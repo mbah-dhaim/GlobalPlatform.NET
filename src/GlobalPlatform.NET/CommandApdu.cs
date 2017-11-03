@@ -37,9 +37,9 @@ namespace GlobalPlatform.NET
             }
         }
 
-        public ApduClass CLA { get; set; }
+        public byte CLA { get; set; }
 
-        public ApduInstruction INS { get; private set; }
+        public byte INS { get; private set; }
 
         public byte P1 { get; private set; }
 
@@ -97,7 +97,7 @@ namespace GlobalPlatform.NET
         /// <param name="p1"></param>
         /// <param name="p2"></param>
         /// <returns></returns>
-        public static CommandApdu Case1(ApduClass cla, ApduInstruction ins, byte p1, byte p2) => new CommandApdu
+        public static CommandApdu Case1(byte cla, byte ins, byte p1, byte p2) => new CommandApdu
         {
             CLA = cla,
             INS = ins,
@@ -115,7 +115,7 @@ namespace GlobalPlatform.NET
         /// <param name="p2"></param>
         /// <param name="le"></param>
         /// <returns></returns>
-        public static CommandApdu Case2S(ApduClass cla, ApduInstruction ins, byte p1, byte p2, byte le)
+        public static CommandApdu Case2S(byte cla, byte ins, byte p1, byte p2, byte le)
         {
             var apdu = Case1(cla, ins, p1, p2);
 
@@ -133,7 +133,7 @@ namespace GlobalPlatform.NET
         /// <param name="p2"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static CommandApdu Case3S(ApduClass cla, ApduInstruction ins, byte p1, byte p2, byte[] data)
+        public static CommandApdu Case3S(byte cla, byte ins, byte p1, byte p2, byte[] data)
         {
             var apdu = Case1(cla, ins, p1, p2);
 
@@ -152,7 +152,7 @@ namespace GlobalPlatform.NET
         /// <param name="data"></param>
         /// <param name="le"></param>
         /// <returns></returns>
-        public static CommandApdu Case4S(ApduClass cla, ApduInstruction ins, byte p1, byte p2, byte[] data, byte le)
+        public static CommandApdu Case4S(byte cla, byte ins, byte p1, byte p2, byte[] data, byte le)
         {
             var apdu = Case3S(cla, ins, p1, p2, data);
 

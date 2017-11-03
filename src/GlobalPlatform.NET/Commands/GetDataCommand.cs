@@ -1,9 +1,9 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using System.Linq;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using System;
-using System.Linq;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -15,14 +15,24 @@ namespace GlobalPlatform.NET.Commands
         KeyInformationTemplate = 0x00E0,
         CardCapabilityInformation = 0x0067,
         CurrentSecurityLevel = 0x00D3,
-        ListApplications = 0x2F00,
+        ApplicationList = 0x2F00,
         ExtendedCardResourcesInformation = 0xFF21,
         SecurityDomainManagerUrl = 0x5F50
     }
 
-    public interface IGetDataObjectPicker
+    public interface IGetDataObjectPicker : IGetDataP1Picker
     {
-        IGetDataTagListPicker GetDataFrom(DataObject getDataObject);
+        IGetDataTagListPicker FromDataObject(DataObject dataObject);
+    }
+
+    public interface IGetDataP1Picker
+    {
+        IGetDataP2Picker UsingP1(byte p1);
+    }
+
+    public interface IGetDataP2Picker
+    {
+        IGetDataTagListPicker UsingP2(byte p2);
     }
 
     public interface IGetDataTagListPicker : IApduBuilder
@@ -39,14 +49,36 @@ namespace GlobalPlatform.NET.Commands
     /// </summary>
     public class GetDataCommand : CommandBase<GetDataCommand, IGetDataObjectPicker>,
         IGetDataObjectPicker,
+        IGetDataP2Picker,
         IGetDataTagListPicker
     {
-        private DataObject getDataObject;
         private byte[] tagList = new byte[0];
 
-        public IGetDataTagListPicker GetDataFrom(DataObject getDataObject)
+        public IGetDataTagListPicker FromDataObject(DataObject dataObject)
         {
-            this.getDataObject = getDataObject;
+            var bytes = BitConverter.GetBytes((ushort)dataObject);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+
+            this.P1 = bytes.First();
+            this.P2 = bytes.Last();
+
+            return this;
+        }
+
+        public IGetDataP2Picker UsingP1(byte p1)
+        {
+            this.P1 = p1;
+
+            return this;
+        }
+
+        public IGetDataTagListPicker UsingP2(byte p2)
+        {
+            this.P2 = p2;
 
             return this;
         }
@@ -61,18 +93,6 @@ namespace GlobalPlatform.NET.Commands
         }
 
         public override CommandApdu AsApdu()
-        {
-            var bytes = BitConverter.GetBytes((ushort)this.getDataObject);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-
-            byte p1 = bytes.First();
-            byte p2 = bytes.Last();
-
-            return CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.GetData, p1, p2, this.tagList, 0x00);
-        }
+            => CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.GetData, this.P1, this.P2, this.tagList, 0x00);
     }
 }

@@ -11,21 +11,32 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
         public void GetData_List_Applications()
         {
             var apdu = GetDataCommand.Build
-                .GetDataFrom(DataObject.ListApplications)
+                .FromDataObject(DataObject.ApplicationList)
                 .WithTagList(0x5C, 0x00)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetData, 0x2F, 0x00, 0x5C, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetData, 0x2F, 0x00, 0x5C, 0x00);
         }
 
         [TestMethod]
         public void GetData_Key_Information_Template()
         {
             var apdu = GetDataCommand.Build
-                .GetDataFrom(DataObject.KeyInformationTemplate)
+                .FromDataObject(DataObject.KeyInformationTemplate)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.GetData, 0x00, 0xE0, 0x00);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetData, 0x00, 0xE0, 0x00);
+        }
+
+        [TestMethod]
+        public void GetData_Custom_P1_P2()
+        {
+            var apdu = GetDataCommand.Build
+                .UsingP1(0x9F)
+                .UsingP2(0x7F)
+                .AsApdu();
+
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.GetData, 0x9F, 0x7F, 0x00);
         }
     }
 }

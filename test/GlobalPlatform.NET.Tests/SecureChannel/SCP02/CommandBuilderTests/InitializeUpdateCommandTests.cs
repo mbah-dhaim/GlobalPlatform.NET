@@ -18,7 +18,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .WithHostChallenge(out hostChallenge)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge, 0x00);
         }
 
         [TestMethod]
@@ -32,7 +32,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
                 .WithHostChallenge(hostChallenge)
                 .AsApdu();
 
-            apdu.Assert(ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge);
+            apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.InitializeUpdate, keyVersion, 0x00, hostChallenge, 0x00);
         }
     }
 }
