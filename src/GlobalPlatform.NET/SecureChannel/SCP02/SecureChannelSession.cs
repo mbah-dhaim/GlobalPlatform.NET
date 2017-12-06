@@ -110,7 +110,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             // If bit 0 is set, the current security level requires the use of a C-MAC.
             if (CheckSecurityLevelOption(0b00000001) || apdu.INS == ApduInstruction.ExternalAuthenticate)
             {
-                apdu.CLA = ApduClass.SecureMessaging;
+                apdu.CLA = apdu.CLA |= 0b00000100;
 
                 var mac = this.GenerateCmac(apdu);
 
