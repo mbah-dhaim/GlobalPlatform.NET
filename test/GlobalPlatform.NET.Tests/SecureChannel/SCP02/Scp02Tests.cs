@@ -10,11 +10,15 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
     [TestClass]
     public class Scp02Tests
     {
+        private static readonly (byte[] Key1, byte[] Key2, byte[] Key3) Keys = (
+            new byte[] {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F},
+            new byte[] {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F},
+            new byte[] {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F}
+            );
+
         [TestMethod]
         public void SecureChannel_Scp02_Option15_Establish_Session()
         {
-            byte[] key1, key2, key3;
-            key1 = key2 = key3 = new byte[] { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F };
             byte[] hostChallenge = { 0xED, 0x29, 0x3C, 0x60, 0xB5, 0x0D, 0xF4, 0x20 };
 
             byte[] initializeUpdateResponse = { 0x00, 0x00, 0x74, 0x74, 0x6E, 0x6E, 0x6E, 0x62, 0x62, 0x62, 0xFF, 0x02, 0x00, 0x00, 0x3D, 0x02, 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00 };
@@ -23,9 +27,9 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 .UsingScp02()
                 .UsingOption15()
                 .UsingSecurityLevel(SecurityLevel.CMac)
-                .UsingEncryptionKey(key1)
-                .UsingMacKey(key2)
-                .UsingDataEncryptionKey(key3)
+                .UsingEncryptionKey(Keys.Key1)
+                .UsingMacKey(Keys.Key2)
+                .UsingDataEncryptionKey(Keys.Key3)
                 .UsingHostChallenge(hostChallenge)
                 .UsingInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();
@@ -40,8 +44,6 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
         [TestMethod]
         public void SecureChannel_Scp02_Option15_Secure_APDU_Cmac()
         {
-            byte[] key1, key2, key3;
-            key1 = key2 = key3 = new byte[] { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F };
             byte[] hostChallenge = { 0xED, 0x29, 0x3C, 0x60, 0xB5, 0x0D, 0xF4, 0x20 };
 
             byte[] initializeUpdateResponse = { 0x00, 0x00, 0x74, 0x74, 0x6E, 0x6E, 0x6E, 0x62, 0x62, 0x62, 0xFF, 0x02, 0x00, 0x00, 0x3D, 0x02, 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00 };
@@ -50,9 +52,9 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 .UsingScp02()
                 .UsingOption15()
                 .UsingSecurityLevel(SecurityLevel.CMac)
-                .UsingEncryptionKey(key1)
-                .UsingMacKey(key2)
-                .UsingDataEncryptionKey(key3)
+                .UsingEncryptionKey(Keys.Key1)
+                .UsingMacKey(Keys.Key2)
+                .UsingDataEncryptionKey(Keys.Key3)
                 .UsingHostChallenge(hostChallenge)
                 .UsingInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();
@@ -72,8 +74,6 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
         [TestMethod]
         public void SecureChannel_Scp02_Option15_Secure_APDU_Command_Encryption()
         {
-            byte[] key1, key2, key3;
-            key1 = key2 = key3 = new byte[] { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F };
             byte[] hostChallenge = { 0xED, 0x29, 0x3C, 0x60, 0xB5, 0x0D, 0xF4, 0x20 };
 
             byte[] initializeUpdateResponse = { 0x00, 0x00, 0x74, 0x74, 0x6E, 0x6E, 0x6E, 0x62, 0x62, 0x62, 0xFF, 0x02, 0x00, 0x00, 0x3D, 0x02, 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00 };
@@ -82,9 +82,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 .UsingScp02()
                 .UsingOption15()
                 .UsingSecurityLevel(SecurityLevel.CDecryption)
-                .UsingEncryptionKey(key1)
-                .UsingMacKey(key2)
-                .UsingDataEncryptionKey(key3)
+                .UsingKeysFrom(Keys, k => k.Key1, k => k.Key2, k => k.Key3)
                 .UsingHostChallenge(hostChallenge)
                 .UsingInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();

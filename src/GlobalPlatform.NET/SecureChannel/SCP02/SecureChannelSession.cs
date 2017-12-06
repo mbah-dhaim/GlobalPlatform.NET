@@ -1,12 +1,12 @@
-﻿using GlobalPlatform.NET.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.Interfaces;
 using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
 using GlobalPlatform.NET.SecureChannel.SCP02.Interfaces;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
@@ -19,7 +19,15 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
     public interface IScp02SecurityLevelPicker
     {
-        IScp02EncryptionKeyPicker UsingSecurityLevel(SecurityLevel securityLevel);
+        IScp02KeyPicker UsingSecurityLevel(SecurityLevel securityLevel);
+    }
+
+    public interface IScp02KeyPicker : IScp02EncryptionKeyPicker
+    {
+        IScp02HostChallengePicker UsingKeysFrom<T>(T keyObject,
+            Func<T, IEnumerable<byte>> encryptionKeySelector,
+            Func<T, IEnumerable<byte>> macKeySelector,
+            Func<T, IEnumerable<byte>> dataEncryptionKeySelector);
     }
 
     public interface IScp02EncryptionKeyPicker
@@ -44,14 +52,14 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
     public interface IScp02InitializeUpdateResponsePicker
     {
-        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);
+        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);    
     }
 
     [Serializable]
     public class SecureChannelSession : IScp02SecureChannelSession,
         IScp02SessionBuilder,
         IScp02SecurityLevelPicker,
-        IScp02EncryptionKeyPicker,
+        IScp02KeyPicker,
         IScp02MacKeyPicker,
         IScp02DataEncryptionKeyPicker,
         IScp02HostChallengePicker,
@@ -177,9 +185,29 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return this;
         }
 
-        public IScp02EncryptionKeyPicker UsingSecurityLevel(SecurityLevel securityLevel)
+        public IScp02KeyPicker UsingSecurityLevel(SecurityLevel securityLevel)
         {
             this.SecurityLevel = securityLevel;
+
+            return this;
+        }
+
+        public IScp02HostChallengePicker UsingKeysFrom<T>(T keyObject,
+            Func<T, IEnumerable<byte>> encryptionKeySelector,
+            Func<T, IEnumerable<byte>> macKeySelector,
+            Func<T, IEnumerable<byte>> dataEncryptionKeySelector)
+        {
+            var encryptionKey = encryptionKeySelector(keyObject).ToArray();
+            var macKey = macKeySelector(keyObject).ToArray();
+            var dataEncryptionKey = dataEncryptionKeySelector(keyObject).ToArray();
+
+            Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
+            Ensure.HasCount(macKey, nameof(macKey), 16);
+            Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
+
+            this.encryptionKey = encryptionKey;
+            this.macKey = macKey;
+            this.dataEncryptionKey = dataEncryptionKey;
 
             return this;
         }
