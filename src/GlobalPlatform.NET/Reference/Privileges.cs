@@ -1,5 +1,5 @@
-﻿using GlobalPlatform.NET.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using GlobalPlatform.NET.Extensions;
 
 namespace GlobalPlatform.NET.Reference
 {

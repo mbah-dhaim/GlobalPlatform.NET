@@ -1,9 +1,10 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SecureChannel.Cryptography;
-using System;
+using Iso7816;
 
 namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
 {

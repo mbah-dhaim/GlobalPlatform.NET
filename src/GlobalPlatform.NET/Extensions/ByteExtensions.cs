@@ -1,6 +1,6 @@
-﻿using GlobalPlatform.NET.Tools;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Extensions
 {

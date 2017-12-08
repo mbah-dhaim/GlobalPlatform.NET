@@ -7,6 +7,7 @@ using GlobalPlatform.NET.SecureChannel.Interfaces;
 using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
 using GlobalPlatform.NET.SecureChannel.SCP02.Interfaces;
 using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+using Iso7816;
 using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
@@ -52,7 +53,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
     public interface IScp02InitializeUpdateResponsePicker
     {
-        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);    
+        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);
     }
 
     [Serializable]
@@ -97,6 +98,11 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
         public CommandApdu SecureApdu(CommandApdu apdu)
         {
+            if (apdu.ExtendedMode)
+            {
+                throw new InvalidOperationException("Extended APDU commands are not supported.");
+            }
+
             if (apdu.CLA != ApduClass.GlobalPlatform)
             {
                 return apdu;
@@ -124,7 +130,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             // If bit 1 is set, the current security level requires the use of command encryption.
             if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
             {
-                var commandData = apdu.CommandData.Take(apdu.CommandData.Length - 8);
+                var commandData = apdu.CommandData.Take(apdu.CommandData.Count() - 8);
                 var mac = apdu.CommandData.TakeLast(8);
 
                 var padded = commandData.ToList().Pad();
@@ -164,7 +170,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         {
             var apduData = new List<byte> { (byte)apdu.CLA, (byte)apdu.INS, apdu.P1, apdu.P2 };
 
-            byte newLc = checked((byte)(apdu.Lc + 8));
+            byte newLc = checked((byte)(apdu.Lc.First() + 8));
 
             apduData.Add(newLc);
             apduData.AddRange(apdu.CommandData);

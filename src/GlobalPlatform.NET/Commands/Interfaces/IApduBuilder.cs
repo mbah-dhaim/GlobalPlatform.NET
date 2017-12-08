@@ -1,4 +1,6 @@
-﻿namespace GlobalPlatform.NET.Commands.Interfaces
+﻿using Iso7816;
+
+namespace GlobalPlatform.NET.Commands.Interfaces
 {
     public interface IApduBuilder
     {

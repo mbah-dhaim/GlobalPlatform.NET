@@ -1,11 +1,11 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using System.Security.Cryptography;
+using FluentAssertions;
 using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
-using System.Security.Cryptography;
 using GlobalPlatform.NET.Tools;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
@@ -31,7 +31,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.PutKey, keyVersion, keyIdentifier, 0x00);
 
-            apdu.Lc.Should().Be(1 + 3 * 22);
+            apdu.Lc.ShouldAllBeEquivalentTo(1 + 3 * 22);
             apdu.CommandData.First().Should().Be(keyVersion);
             apdu.CommandData.Skip(1).Split(22).ForEach(block =>
             {

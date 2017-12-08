@@ -1,6 +1,7 @@
-﻿using GlobalPlatform.NET.Commands.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Commands.Interfaces;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands.Abstractions
 {
@@ -18,6 +19,6 @@ namespace GlobalPlatform.NET.Commands.Abstractions
 
         public abstract IEnumerable<CommandApdu> AsApdus();
 
-        public IEnumerable<byte[]> AsBytes() => this.AsApdus().Select(apdu => apdu.Buffer);
+        public IEnumerable<byte[]> AsBytes() => this.AsApdus().Select(apdu => apdu.Buffer.ToArray());
     }
 }

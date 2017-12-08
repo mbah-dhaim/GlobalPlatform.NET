@@ -1,7 +1,7 @@
-﻿using GlobalPlatform.NET.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using GlobalPlatform.NET.Extensions;
 using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
 using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
 
