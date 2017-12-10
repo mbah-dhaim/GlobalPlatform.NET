@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace GlobalPlatform.NET.SecureChannel.Cryptography
+namespace GlobalPlatform.NET.Cryptography
 {
     internal static class SecureRandom
     {

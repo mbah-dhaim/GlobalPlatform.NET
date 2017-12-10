@@ -1,12 +1,12 @@
 ﻿using System;
 using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
+using GlobalPlatform.NET.Cryptography;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.Cryptography;
 using Iso7816;
 
-namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
+namespace GlobalPlatform.NET.SCP02.Commands
 {
     public interface IInitializeUpdateKeyVersionPicker
     {

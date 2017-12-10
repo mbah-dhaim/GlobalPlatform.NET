@@ -2,8 +2,8 @@
 using FluentAssertions;
 using GlobalPlatform.NET.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using DES = GlobalPlatform.NET.Cryptography.DES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Tests
 {

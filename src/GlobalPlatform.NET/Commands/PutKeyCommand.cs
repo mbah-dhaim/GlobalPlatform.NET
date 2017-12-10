@@ -8,7 +8,7 @@ using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Iso7816;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Commands
 {

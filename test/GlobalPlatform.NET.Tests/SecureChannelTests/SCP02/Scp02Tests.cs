@@ -1,12 +1,13 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using GlobalPlatform.NET.Commands;
+using GlobalPlatform.NET.Exceptions;
 using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel;
-using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+using GlobalPlatform.NET.SCP02.Reference;
 using Iso7816;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
+namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
 {
     [TestClass]
     public class Scp02Tests
@@ -28,16 +29,18 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00
             });
 
-            var secureChannelSession = SecureChannelSession.Build
-                .UsingScp02()
-                .UsingOption15()
-                .UsingSecurityLevel(SecurityLevel.CMac)
+            SecureChannel.Setup
+                .Scp02()
+                .Option15()
+                .ChangeSecurityLevelTo(SecurityLevel.CMac)
                 .UsingEncryptionKey(Keys.Key1)
-                .UsingMacKey(Keys.Key2)
-                .UsingDataEncryptionKey(Keys.Key3)
-                .UsingHostChallenge(hostChallenge)
-                .UsingInitializeUpdateResponse(initializeUpdateResponse)
-                .Establish();
+                .AndMacKey(Keys.Key2)
+                .AndDataEncryptionKey(Keys.Key3)
+                .WithHostChallenge(hostChallenge)
+                .AndInitializeUpdateResponse(initializeUpdateResponse)
+                .TryEstablish(out var secureChannelSession)
+                .Should()
+                .BeTrue();
 
             secureChannelSession.EncryptionKey.ShouldBeEquivalentTo(new byte[] { 0x01, 0x0B, 0x03, 0x71, 0xD7, 0x83, 0x77, 0xB8, 0x01, 0xF2, 0xD6, 0x2A, 0xFC, 0x67, 0x1D, 0x95 });
             secureChannelSession.CMacKey.ShouldBeEquivalentTo(new byte[] { 0xD1, 0xC2, 0x8C, 0x60, 0x16, 0x52, 0xA4, 0x77, 0x0D, 0x67, 0xAD, 0x82, 0xD2, 0xD2, 0xE1, 0xC4 });
@@ -57,15 +60,15 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00
             });
 
-            var secureChannelSession = SecureChannelSession.Build
-                .UsingScp02()
-                .UsingOption15()
-                .UsingSecurityLevel(SecurityLevel.CMac)
+            var secureChannelSession = NET.SecureChannel.Setup
+                .Scp02()
+                .Option15()
+                .ChangeSecurityLevelTo(SecurityLevel.CMac)
                 .UsingEncryptionKey(Keys.Key1)
-                .UsingMacKey(Keys.Key2)
-                .UsingDataEncryptionKey(Keys.Key3)
-                .UsingHostChallenge(hostChallenge)
-                .UsingInitializeUpdateResponse(initializeUpdateResponse)
+                .AndMacKey(Keys.Key2)
+                .AndDataEncryptionKey(Keys.Key3)
+                .WithHostChallenge(hostChallenge)
+                .AndInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();
 
             var apdu = GetStatusCommand.Build
@@ -91,13 +94,13 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
                 0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00
             });
 
-            var secureChannelSession = SecureChannelSession.Build
-                .UsingScp02()
-                .UsingOption15()
-                .UsingSecurityLevel(SecurityLevel.CDecryption)
-                .UsingKeysFrom(Keys, k => k.Key1, k => k.Key2, k => k.Key3)
-                .UsingHostChallenge(hostChallenge)
-                .UsingInitializeUpdateResponse(initializeUpdateResponse)
+            var secureChannelSession = NET.SecureChannel.Setup
+                .Scp02()
+                .Option15()
+                .ChangeSecurityLevelTo(SecurityLevel.CDecryption)
+                .UsingKeysFrom(Keys, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key1, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key2, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key3)
+                .WithHostChallenge(hostChallenge)
+                .AndInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();
 
             var apdu = GetStatusCommand.Build
@@ -110,6 +113,57 @@ namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02
 
             securedApdu.CLA.Should().Be(ApduClass.SecureMessaging);
             securedApdu.Lc.ShouldAllBeEquivalentTo(16);
+        }
+
+        [TestMethod]
+        public void SecureChannel_Scp02_Establish_Invalid_Session_Should_Throw()
+        {
+            var initializeUpdateResponse = ResponseApdu.Parse(new byte[]
+            {
+                0x00, 0x00, 0x74, 0x74, 0x6E, 0x6E, 0x6E, 0x62, 0x62, 0x62, 0xFF, 0x02, 0x00, 0x00, 0x3D, 0x02,
+                0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00
+            });
+
+            Action action = () =>
+            {
+                NET.SecureChannel.Setup
+                    .Scp02()
+                    .Option15()
+                    .ChangeSecurityLevelTo(SecurityLevel.CMac)
+                    .UsingEncryptionKey(Keys.Key1)
+                    .AndMacKey(Keys.Key2)
+                    .AndDataEncryptionKey(Keys.Key3)
+                    .WithHostChallenge(new byte[8])
+                    .AndInitializeUpdateResponse(initializeUpdateResponse)
+                    .Establish();
+            };
+
+            action.ShouldThrow<CardCryptogramException>();
+        }
+
+        [TestMethod]
+        public void SecureChannel_Scp02_TryEstablish_Invalid_Session_Should_Return_False()
+        {
+            var initializeUpdateResponse = ResponseApdu.Parse(new byte[]
+            {
+                0x00, 0x00, 0x74, 0x74, 0x6E, 0x6E, 0x6E, 0x62, 0x62, 0x62, 0xFF, 0x02, 0x00, 0x00, 0x3D, 0x02,
+                0x9C, 0x31, 0xC7, 0x89, 0xBD, 0x81, 0xD9, 0x37, 0x9C, 0x00, 0xD2, 0x8F, 0x90, 0x00
+            });
+
+            SecureChannel.Setup
+                .Scp02()
+                .Option15()
+                .ChangeSecurityLevelTo(SecurityLevel.CMac)
+                .UsingEncryptionKey(Keys.Key1)
+                .AndMacKey(Keys.Key2)
+                .AndDataEncryptionKey(Keys.Key3)
+                .WithHostChallenge(new byte[8])
+                .AndInitializeUpdateResponse(initializeUpdateResponse)
+                .TryEstablish(out var secureChannelSession)
+                .Should()
+                .BeFalse();
+
+            secureChannelSession.IsEstablished.Should().BeFalse();
         }
     }
 }

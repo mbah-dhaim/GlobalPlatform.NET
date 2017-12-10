@@ -90,9 +90,9 @@
     <Compile Include="CommandBuilderTests\StoreDataCommandTests.cs" />
     <Compile Include="EncryptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SecureChannel\SCP02\Scp02Tests.cs" />
-    <Compile Include="SecureChannel\SCP02\CommandBuilderTests\ExternalAuthenticateCommandTests.cs" />
-    <Compile Include="SecureChannel\SCP02\CommandBuilderTests\InitializeUpdateCommandTests.cs" />
+    <Compile Include="SecureChannelTests\SCP02\Scp02Tests.cs" />
+    <Compile Include="SecureChannelTests\SCP02\CommandBuilderTests\ExternalAuthenticateCommandTests.cs" />
+    <Compile Include="SecureChannelTests\SCP02\CommandBuilderTests\InitializeUpdateCommandTests.cs" />
     <Compile Include="ToolsTests\GetStatusResponseTests.cs" />
     <Compile Include="ToolsTests\KeyCheckValueTests.cs" />
     <Compile Include="ToolsTests\TlvTests.cs" />

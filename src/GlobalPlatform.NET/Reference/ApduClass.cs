@@ -16,5 +16,15 @@
         /// Secure messaging – GlobalPlatform proprietary. 
         /// </summary>
         public static byte SecureMessaging = 0x84;
+
+        /// <summary>
+        /// Defines the type of byte coding used in the CLA byte.
+        /// <para> Based on section 11.1.4 of the v2.3 GlobalPlatform Card Specification. </para>
+        /// </summary>
+        public enum ByteCoding
+        {
+            First,
+            InterIndustry
+        }
     }
 }

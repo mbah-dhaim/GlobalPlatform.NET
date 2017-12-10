@@ -1,8 +1,8 @@
 ﻿using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
+using GlobalPlatform.NET.SCP02.Commands;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
+namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02.CommandBuilderTests
 {
     [TestClass]
     public class InitializeUpdateCommandTests : CommandTestsBase

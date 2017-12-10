@@ -6,7 +6,7 @@ using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 {

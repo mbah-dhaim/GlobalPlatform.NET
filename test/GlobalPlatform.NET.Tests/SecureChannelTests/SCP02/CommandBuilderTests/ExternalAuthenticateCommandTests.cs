@@ -1,9 +1,9 @@
 ﻿using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.SCP02.Commands;
-using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+using GlobalPlatform.NET.SCP02.Commands;
+using GlobalPlatform.NET.SCP02.Reference;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GlobalPlatform.NET.Tests.SecureChannel.SCP02.CommandBuilderTests
+namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02.CommandBuilderTests
 {
     [TestClass]
     public class ExternalAuthenticateCommandTests : CommandTestsBase

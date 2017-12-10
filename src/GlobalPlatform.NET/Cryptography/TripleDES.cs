@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
 
-namespace GlobalPlatform.NET.SecureChannel.Cryptography
+namespace GlobalPlatform.NET.Cryptography
 {
-    internal static class DES
+    internal static class TripleDES
     {
         public static byte[] Encrypt(byte[] data, byte[] key)
             => Encrypt(data, key, CipherMode.CBC);
@@ -13,7 +13,7 @@ namespace GlobalPlatform.NET.SecureChannel.Cryptography
 
         public static byte[] Encrypt(byte[] data, byte[] key, byte[] iv, CipherMode cipherMode)
         {
-            using (var des = System.Security.Cryptography.DES.Create())
+            using (var des = System.Security.Cryptography.TripleDES.Create())
             {
                 des.Mode = cipherMode;
                 des.Padding = PaddingMode.None;

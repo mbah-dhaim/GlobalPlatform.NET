@@ -1,30 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Exceptions;
 using GlobalPlatform.NET.Extensions;
+using GlobalPlatform.NET.Interfaces;
 using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.Interfaces;
-using GlobalPlatform.NET.SecureChannel.SCP02.Cryptography;
-using GlobalPlatform.NET.SecureChannel.SCP02.Interfaces;
-using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+using GlobalPlatform.NET.SCP02.Cryptography;
+using GlobalPlatform.NET.SCP02.Interfaces;
+using GlobalPlatform.NET.SCP02.Reference;
 using Iso7816;
-using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using DES = GlobalPlatform.NET.Cryptography.DES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
-namespace GlobalPlatform.NET.SecureChannel.SCP02
+namespace GlobalPlatform.NET.SCP02
 {
     public interface IScp02SessionBuilder
     {
-        IScp02SecurityLevelPicker UsingOption15();
+        /// <summary>
+        /// Uses i=15 to configure the SCP02 secure channel. 
+        /// <para> Based on section E.1.1 of the v2.3 GlobalPlatform Card Specification. </para>
+        /// </summary>
+        /// <returns></returns>
+        IScp02SecurityLevelPicker Option15();
     }
 
     public interface IScp02SecurityLevelPicker
     {
-        IScp02KeyPicker UsingSecurityLevel(SecurityLevel securityLevel);
+        IScp02KeyPicker ChangeSecurityLevelTo(SecurityLevel securityLevel);
     }
 
     public interface IScp02KeyPicker : IScp02EncryptionKeyPicker
     {
+        /// <summary>
+        /// Specifies the object containing the 3 secure channel keys that you wish to use for this
+        /// secure channel.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="keyObject"></param>
+        /// <param name="encryptionKeySelector"></param>
+        /// <param name="macKeySelector"></param>
+        /// <param name="dataEncryptionKeySelector"></param>
+        /// <returns></returns>
         IScp02HostChallengePicker UsingKeysFrom<T>(T keyObject,
             Func<T, IEnumerable<byte>> encryptionKeySelector,
             Func<T, IEnumerable<byte>> macKeySelector,
@@ -33,27 +49,52 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
 
     public interface IScp02EncryptionKeyPicker
     {
+        /// <summary>
+        /// Specifies the encryption key that you wish to use for this secure channel. 
+        /// </summary>
+        /// <param name="encryptionKey"></param>
+        /// <returns></returns>
         IScp02MacKeyPicker UsingEncryptionKey(byte[] encryptionKey);
     }
 
     public interface IScp02MacKeyPicker
     {
-        IScp02DataEncryptionKeyPicker UsingMacKey(byte[] macKey);
+        /// <summary>
+        /// Specifies the MAC key that you wish to use for this secure channel. 
+        /// </summary>
+        /// <param name="macKey"></param>
+        /// <returns></returns>
+        IScp02DataEncryptionKeyPicker AndMacKey(byte[] macKey);
     }
 
     public interface IScp02DataEncryptionKeyPicker
     {
-        IScp02HostChallengePicker UsingDataEncryptionKey(byte[] dataEncryptionKey);
+        /// <summary>
+        /// Specifies the data encryption key that you wish to use for this secure channel. 
+        /// </summary>
+        /// <param name="dataEncryptionKey"></param>
+        /// <returns></returns>
+        IScp02HostChallengePicker AndDataEncryptionKey(byte[] dataEncryptionKey);
     }
 
     public interface IScp02HostChallengePicker
     {
-        IScp02InitializeUpdateResponsePicker UsingHostChallenge(byte[] hostChallenge);
+        /// <summary>
+        /// The host challenge used in the preceding INITIALIZE UPDATE command. 
+        /// </summary>
+        /// <param name="hostChallenge"></param>
+        /// <returns></returns>
+        IScp02InitializeUpdateResponsePicker WithHostChallenge(byte[] hostChallenge);
     }
 
     public interface IScp02InitializeUpdateResponsePicker
     {
-        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse);
+        /// <summary>
+        /// The response buffer to the proceeding INITIALIZE UPDATE command. 
+        /// </summary>
+        /// <param name="initializeUpdateResponse"></param>
+        /// <returns></returns>
+        ISecureChannelSessionEstablisher<IScp02SecureChannelSession> AndInitializeUpdateResponse(byte[] initializeUpdateResponse);
     }
 
     [Serializable]
@@ -69,14 +110,15 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         private byte[] encryptionKey;
         private byte[] macKey;
         private byte[] dataEncryptionKey;
-        private byte[] hostChallenge;
         private byte[] initializeUpdateResponse;
 
-        private IEnumerable<byte> SequenceCounter => this.initializeUpdateResponse.Skip(12).Take(2);
+        public byte[] SequenceCounter => this.initializeUpdateResponse.Skip(12).Take(2).ToArray();
 
-        private IEnumerable<byte> CardChallenge => this.initializeUpdateResponse.Skip(14).Take(6);
+        public byte[] CardChallenge => this.initializeUpdateResponse.Skip(14).Take(6).ToArray();
 
-        private IEnumerable<byte> CardCryptogram => this.initializeUpdateResponse.Skip(20).Take(8);
+        public byte[] HostChallenge { get; private set; }
+
+        public byte[] CardCryptogram => this.initializeUpdateResponse.Skip(20).Take(8).ToArray();
 
         public bool IsEstablished { get; private set; }
 
@@ -100,23 +142,39 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         {
             if (apdu.ExtendedMode)
             {
-                throw new InvalidOperationException("Extended APDU commands are not supported.");
+                throw new InvalidOperationException("Extended commands APDUs are not supported.");
             }
 
-            if (apdu.CLA != ApduClass.GlobalPlatform)
+            ApduClass.ByteCoding classByteCoding;
+
+            if (apdu.CLA.IsBitSet(7))
+            {
+                classByteCoding = ApduClass.ByteCoding.First;
+            }
+            else if (apdu.CLA.IsBitSet(6))
+            {
+                classByteCoding = ApduClass.ByteCoding.InterIndustry;
+            }
+            else
             {
                 return apdu;
             }
 
-            bool CheckSecurityLevelOption(byte mask)
+            if (this.SecurityLevel.HasFlag(SecurityLevel.CMac) || apdu.INS == ApduInstruction.ExternalAuthenticate)
             {
-                return ((byte)this.SecurityLevel & mask) == mask;
-            }
+                switch (classByteCoding)
+                {
+                    case ApduClass.ByteCoding.First:
+                        apdu.CLA = apdu.CLA |= 0b00000100;
+                        break;
 
-            // If bit 0 is set, the current security level requires the use of a C-MAC.
-            if (CheckSecurityLevelOption(0b00000001) || apdu.INS == ApduInstruction.ExternalAuthenticate)
-            {
-                apdu.CLA = apdu.CLA |= 0b00000100;
+                    case ApduClass.ByteCoding.InterIndustry:
+                        apdu.CLA = apdu.CLA |= 0b00100000;
+                        break;
+
+                    default:
+                        throw new InvalidOperationException("APDU does not use either First or Interindustry Class Byte coding.");
+                }
 
                 var mac = this.GenerateCmac(apdu);
 
@@ -127,15 +185,14 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 apdu.CommandData = data.ToArray();
             }
 
-            // If bit 1 is set, the current security level requires the use of command encryption.
-            if (CheckSecurityLevelOption(0b00000010) && apdu.INS != ApduInstruction.ExternalAuthenticate)
+            if (this.SecurityLevel.HasFlag(SecurityLevel.CDecryption) && apdu.INS != ApduInstruction.ExternalAuthenticate)
             {
-                var commandData = apdu.CommandData.Take(apdu.CommandData.Count() - 8);
+                var commandData = apdu.CommandData.Take(apdu.CommandData.Count() - 8).ToList();
                 var mac = apdu.CommandData.TakeLast(8);
 
-                var padded = commandData.ToList().Pad();
+                byte[] padded = commandData.Pad().ToArray();
 
-                byte[] encrypted = TripleDES.Encrypt(padded.ToArray(), this.EncryptionKey);
+                byte[] encrypted = TripleDES.Encrypt(padded, this.EncryptionKey);
 
                 var data = new List<byte>();
                 data.AddRange(encrypted);
@@ -147,7 +204,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return apdu;
         }
 
-        internal byte[] GenerateCmac(CommandApdu apdu)
+        private byte[] GenerateCmac(CommandApdu apdu)
         {
             byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : DES.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
 
@@ -166,11 +223,11 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         /// </summary>
         /// <param name="apdu"></param>
         /// <returns></returns>
-        internal static byte[] GetDataForCmac(CommandApdu apdu)
+        private static byte[] GetDataForCmac(CommandApdu apdu)
         {
-            var apduData = new List<byte> { (byte)apdu.CLA, (byte)apdu.INS, apdu.P1, apdu.P2 };
+            var apduData = new List<byte> { apdu.CLA, apdu.INS, apdu.P1, apdu.P2 };
 
-            byte newLc = checked((byte)(apdu.Lc.First() + 8));
+            byte newLc = checked((byte)(apdu.Lc.FirstOrDefault() + 8));
 
             apduData.Add(newLc);
             apduData.AddRange(apdu.CommandData);
@@ -186,12 +243,12 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         public IEnumerable<CommandApdu> SecureApdu(IEnumerable<CommandApdu> apdus)
             => this.SecureApdu(apdus.ToArray());
 
-        public IScp02SecurityLevelPicker UsingOption15()
+        public IScp02SecurityLevelPicker Option15()
         {
             return this;
         }
 
-        public IScp02KeyPicker UsingSecurityLevel(SecurityLevel securityLevel)
+        public IScp02KeyPicker ChangeSecurityLevelTo(SecurityLevel securityLevel)
         {
             this.SecurityLevel = securityLevel;
 
@@ -227,7 +284,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return this;
         }
 
-        public IScp02DataEncryptionKeyPicker UsingMacKey(byte[] macKey)
+        public IScp02DataEncryptionKeyPicker AndMacKey(byte[] macKey)
         {
             Ensure.HasCount(macKey, nameof(macKey), 16);
 
@@ -236,7 +293,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return this;
         }
 
-        public IScp02HostChallengePicker UsingDataEncryptionKey(byte[] dataEncryptionKey)
+        public IScp02HostChallengePicker AndDataEncryptionKey(byte[] dataEncryptionKey)
         {
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
@@ -245,16 +302,16 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return this;
         }
 
-        public IScp02InitializeUpdateResponsePicker UsingHostChallenge(byte[] hostChallenge)
+        public IScp02InitializeUpdateResponsePicker WithHostChallenge(byte[] hostChallenge)
         {
             Ensure.HasCount(hostChallenge, nameof(hostChallenge), 8);
 
-            this.hostChallenge = hostChallenge;
+            this.HostChallenge = hostChallenge;
 
             return this;
         }
 
-        public ISecureChannelSessionEstablisher<IScp02SecureChannelSession> UsingInitializeUpdateResponse(byte[] initializeUpdateResponse)
+        public ISecureChannelSessionEstablisher<IScp02SecureChannelSession> AndInitializeUpdateResponse(byte[] initializeUpdateResponse)
         {
             Ensure.HasCount(initializeUpdateResponse, nameof(initializeUpdateResponse), 30);
 
@@ -271,16 +328,31 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
         public IScp02SecureChannelSession Establish()
         {
             this.GenerateSessionKeys();
-            this.VerifyCardCryptogram();
-
             this.HostCryptogram = this.GenerateCryptogram(CryptogramType.Host);
+            this.VerifyCardCryptogram();
 
             this.IsEstablished = true;
 
             return this;
         }
 
-        internal void GenerateSessionKeys()
+        public bool TryEstablish(out IScp02SecureChannelSession secureChannelSession)
+        {
+            try
+            {
+                this.Establish();
+            }
+            catch
+            {
+                // ignored
+            }
+
+            secureChannelSession = this;
+
+            return this.IsEstablished;
+        }
+
+        private void GenerateSessionKeys()
         {
             this.EncryptionKey = this.GenerateSessionKey(SessionKeyType.SEnc, this.encryptionKey);
             this.CMacKey = this.GenerateSessionKey(SessionKeyType.CMac, this.macKey);
@@ -288,7 +360,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             this.DataEncryptionKey = this.GenerateSessionKey(SessionKeyType.Dek, this.dataEncryptionKey);
         }
 
-        internal byte[] GenerateDerivationData(SessionKeyType sessionKeyType)
+        private byte[] GenerateDerivationData(SessionKeyType sessionKeyType)
         {
             var data = new List<byte> { 0x01, (byte)sessionKeyType };
 
@@ -298,34 +370,38 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
             return data.ToArray();
         }
 
-        internal byte[] GenerateSessionKey(SessionKeyType sessionKeyType, byte[] staticKey)
+        private byte[] GenerateSessionKey(SessionKeyType sessionKeyType, byte[] staticKey)
             => TripleDES.Encrypt(this.GenerateDerivationData(sessionKeyType), staticKey);
 
-        internal void VerifyCardCryptogram()
+        private void VerifyCardCryptogram()
         {
             var fromCard = this.CardCryptogram;
             var generated = this.GenerateCryptogram(CryptogramType.Card);
 
             if (!fromCard.SequenceEqual(generated))
             {
-                throw new Exception("Card cryptogram could not be verified.");
+                throw new CardCryptogramException("Card cryptogram could not be verified.")
+                {
+                    ReceivedCryptogram = fromCard,
+                    GeneratedCryptogram = generated
+                };
             }
         }
 
-        internal enum CryptogramType
+        private enum CryptogramType
         {
             Card,
             Host
         }
 
-        internal byte[] GenerateCryptogram(CryptogramType cryptogramType)
+        private byte[] GenerateCryptogram(CryptogramType cryptogramType)
         {
             var data = new List<byte>();
 
             switch (cryptogramType)
             {
                 case CryptogramType.Card:
-                    data.AddRange(this.hostChallenge);
+                    data.AddRange(this.HostChallenge);
                     data.AddRange(this.SequenceCounter);
                     data.AddRange(this.CardChallenge);
                     break;
@@ -333,7 +409,7 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02
                 case CryptogramType.Host:
                     data.AddRange(this.SequenceCounter);
                     data.AddRange(this.CardChallenge);
-                    data.AddRange(this.hostChallenge);
+                    data.AddRange(this.HostChallenge);
                     break;
             }
 
