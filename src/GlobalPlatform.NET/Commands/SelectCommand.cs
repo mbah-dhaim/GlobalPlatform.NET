@@ -2,6 +2,7 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands
 {

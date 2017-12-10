@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands.Interfaces
 {

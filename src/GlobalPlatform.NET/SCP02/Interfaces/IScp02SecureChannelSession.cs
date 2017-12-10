@@ -1,7 +1,7 @@
-﻿using GlobalPlatform.NET.SecureChannel.Interfaces;
-using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+﻿using GlobalPlatform.NET.Interfaces;
+using GlobalPlatform.NET.SCP02.Reference;
 
-namespace GlobalPlatform.NET.SecureChannel.SCP02.Interfaces
+namespace GlobalPlatform.NET.SCP02.Interfaces
 {
     public interface IScp02SecureChannelSession : ISecureChannelSession<IScp02SecureChannelSession>
     {
@@ -44,6 +44,30 @@ namespace GlobalPlatform.NET.SecureChannel.SCP02.Interfaces
         /// The session key used to encrypt sensitive data (DEK), e.g. keys. 
         /// </summary>
         byte[] DataEncryptionKey { get; }
+
+        /// <summary>
+        /// The sequence counter contained in the INITIALIZE UPDATE response that was used to seed
+        /// this secure channel session.
+        /// </summary>
+        byte[] SequenceCounter { get; }
+
+        /// <summary>
+        /// The card challenge contained in the INITIALIZE UPDATE response that was used to seed this
+        /// secure channel session.
+        /// </summary>
+        byte[] CardChallenge { get; }
+
+        /// <summary>
+        /// The host challenge contained in the INITIALIZE UPDATE command that was issued before
+        /// establishing this secure channel session.
+        /// </summary>
+        byte[] HostChallenge { get; }
+
+        /// <summary>
+        /// The card cryptogram contained in the INITIALIZE UPDATE response that was used to seed
+        /// this secure channel session.
+        /// </summary>
+        byte[] CardCryptogram { get; }
 
         /// <summary>
         /// The host cryptogram that should be sent to the card using a subsequent EXTERNAL

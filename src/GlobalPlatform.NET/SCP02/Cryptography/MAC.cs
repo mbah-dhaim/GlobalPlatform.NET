@@ -1,11 +1,11 @@
-﻿using GlobalPlatform.NET.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using DES = GlobalPlatform.NET.SecureChannel.Cryptography.DES;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using GlobalPlatform.NET.Extensions;
+using DES = GlobalPlatform.NET.Cryptography.DES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
-namespace GlobalPlatform.NET.SecureChannel.SCP02.Cryptography
+namespace GlobalPlatform.NET.SCP02.Cryptography
 {
     internal static class MAC
     {

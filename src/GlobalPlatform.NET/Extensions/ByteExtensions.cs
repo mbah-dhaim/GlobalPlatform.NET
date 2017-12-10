@@ -1,6 +1,7 @@
-﻿using GlobalPlatform.NET.Tools;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalPlatform.NET.Tools;
 
 namespace GlobalPlatform.NET.Extensions
 {
@@ -50,6 +51,24 @@ namespace GlobalPlatform.NET.Extensions
             }
 
             return bytes;
+        }
+
+        /// <summary>
+        /// Checks if a specific bit within a byte is set to 1.
+        /// </summary>
+        /// <param name="b"></param>
+        /// <param name="bit"></param>
+        /// <returns></returns>
+        public static bool IsBitSet(this byte b, byte bit)
+        {
+            if (bit > 7)
+            {
+                throw new ArgumentOutOfRangeException(nameof(b), "The bit to check must be between 0-7 inclusive.");
+            }
+
+            byte mask = (byte)(1 << bit);
+
+            return (b & mask) == mask;
         }
     }
 }

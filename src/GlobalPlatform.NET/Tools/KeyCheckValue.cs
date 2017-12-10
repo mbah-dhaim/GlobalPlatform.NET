@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using GlobalPlatform.NET.Reference;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Tools
 {

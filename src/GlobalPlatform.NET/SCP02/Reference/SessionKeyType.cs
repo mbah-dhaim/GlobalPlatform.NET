@@ -1,4 +1,4 @@
-﻿namespace GlobalPlatform.NET.SecureChannel.SCP02.Reference
+﻿namespace GlobalPlatform.NET.SCP02.Reference
 {
     /// <summary>
     /// Based on section E.4.1 of the v2.3 GlobalPlatform Card Specification. 

@@ -41,23 +41,45 @@ To begin a secure channel session, first issue an INITIALIZE UPDATE command to a
 ```csharp
 InitializeUpdateCommand.Build
     .WithKeyVersion(keyVersion)
-    .WithHostChallenge(out hostChallenge)
+    .WithHostChallenge(out byte[] hostChallenge)
     .AsApdu();
 ```
 
-A secure channel session can then be created using the response to the above command and the static keys on the card:
+A secure channel session can then be created:
 
 ```csharp
-SecureChannelSession.Build
-    .UsingScp02()
-    .UsingOption15()
-    .UsingSecurityLevel(SecurityLevel.CMac)
+SecureChannel.Setup
+    .Scp02()
+    .Option15()
+    .ChangeSecurityLevelTo(SecurityLevel.CMac)
+```
+
+Then specify your static card keys:
+
+```csharp
+    // Individual keys
     .UsingEncryptionKey(key1)
-    .UsingMacKey(key2)
-    .UsingDataEncryptionKey(key3)
-    .UsingHostChallenge(hostChallenge)
-    .UsingInitializeUpdateResponse(initializeUpdateResponse)
+    .AndMacKey(key2)
+    .AndDataEncryptionKey(key3)
+
+    // Keys defined in a single object
+    .UsingKeysFrom(keys, k => k.Key1, k => k.Key2, k => k.Key3)
+```
+
+And the parameters from the `INITIALIZE UPDATE` command:
+
+```csharp
+    .WithHostChallenge(hostChallenge)
+    .AndInitializeUpdateResponse(initializeUpdateResponse)
+```
+
+Lastly, establish the session:
+```csharp
+    // Exceptions will be raised if there are authentication issues
     .Establish();
+
+    // Exceptions will be suppressed
+    .TryEstablish(out var secureChannelSession);
 ```
 
 The secure channel session will verify that the correct keys have been used and that mutual authentication has taken place successfully. Afterwards, the session will be populated with the current session keys and MACs, and will be available for use to secure further communication with the card:
@@ -73,3 +95,5 @@ secureChannelSession.SecureApdu(apdu);
 
 // -> 84-F2-80-00-0A-4F-00-C8-80-21-A2-17-85-DA-7A-00
 ```
+
+

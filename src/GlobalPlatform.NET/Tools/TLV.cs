@@ -38,7 +38,7 @@ namespace GlobalPlatform.NET.Tools
         public int Length => this.Value.Count();
 
         /// <summary>
-        /// Returns the value.
+        /// Returns the value. 
         /// </summary>
         public IEnumerable<byte> Value
         {
@@ -63,7 +63,7 @@ namespace GlobalPlatform.NET.Tools
         public IReadOnlyCollection<TLV> NestedTags => this.nestedTags;
 
         /// <summary>
-        /// Serialises the TLV-encoded data to bytes.
+        /// Serialises the TLV-encoded data to bytes. 
         /// </summary>
         public IEnumerable<byte> Data
         {

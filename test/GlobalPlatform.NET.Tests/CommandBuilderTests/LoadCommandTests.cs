@@ -1,12 +1,12 @@
-﻿using FluentAssertions;
-using GlobalPlatform.NET.Commands;
-using GlobalPlatform.NET.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using GlobalPlatform.NET.Commands;
+using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 {
@@ -45,7 +45,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
                 apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
-                apdu.Lc.Should().Be((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
+                apdu.Lc.ShouldAllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }
 
@@ -79,9 +79,8 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
                 apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
-                apdu.Lc.Should().Be((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
+                apdu.Lc.ShouldAllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }
     }
 }
-

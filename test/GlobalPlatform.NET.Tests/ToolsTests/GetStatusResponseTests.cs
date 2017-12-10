@@ -1,8 +1,8 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.ToolsTests
 {

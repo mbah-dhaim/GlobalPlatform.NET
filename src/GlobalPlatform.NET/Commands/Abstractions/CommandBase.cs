@@ -1,4 +1,6 @@
-﻿using GlobalPlatform.NET.Commands.Interfaces;
+﻿using System.Linq;
+using GlobalPlatform.NET.Commands.Interfaces;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands.Abstractions
 {
@@ -16,6 +18,6 @@ namespace GlobalPlatform.NET.Commands.Abstractions
 
         public abstract CommandApdu AsApdu();
 
-        public byte[] AsBytes() => this.AsApdu().Buffer;
+        public byte[] AsBytes() => this.AsApdu().Buffer.ToArray();
     }
 }

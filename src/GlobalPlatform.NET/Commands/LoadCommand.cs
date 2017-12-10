@@ -1,11 +1,12 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GlobalPlatform.NET.Tools;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -60,9 +61,9 @@ namespace GlobalPlatform.NET.Commands
 
             if (this.securityDomainAID.Any())
             {
-                var dapBlock = TLV.Build((byte) Tag.DapBlock,
-                    TLV.Build((byte) Tag.SecurityDomainAID, this.securityDomainAID),
-                    TLV.Build((byte) Tag.LoadFileDataBlockSignature, this.signature)
+                var dapBlock = TLV.Build((byte)Tag.DapBlock,
+                    TLV.Build((byte)Tag.SecurityDomainAID, this.securityDomainAID),
+                    TLV.Build((byte)Tag.LoadFileDataBlockSignature, this.signature)
                 );
 
                 commandData.AddTLV(dapBlock);

@@ -2,9 +2,10 @@
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using GlobalPlatform.NET.SecureChannel.SCP02.Reference;
+using GlobalPlatform.NET.SCP02.Reference;
+using Iso7816;
 
-namespace GlobalPlatform.NET.SecureChannel.SCP02.Commands
+namespace GlobalPlatform.NET.SCP02.Commands
 {
     public interface ISecurityLevelPicker
     {

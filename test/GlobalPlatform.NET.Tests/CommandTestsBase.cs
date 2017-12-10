@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using FluentAssertions;
-using GlobalPlatform.NET.Reference;
+using Iso7816;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GlobalPlatform.NET.Tests
@@ -84,7 +84,7 @@ namespace GlobalPlatform.NET.Tests
             apdu.INS.Should().Be(ins);
             apdu.P1.Should().Be(p1);
             apdu.P2.Should().Be(p2);
-            apdu.Lc.Should().Be(checked((byte)apdu.CommandData.Length));
+            apdu.Lc.First().Should().Be(checked((byte)apdu.CommandData.Count()));
             apdu.CommandData.ShouldBeEquivalentTo(commandData);
         }
 
@@ -110,7 +110,7 @@ namespace GlobalPlatform.NET.Tests
             apdu.INS.Should().Be(ins);
             apdu.P1.Should().Be(p1);
             apdu.P2.Should().Be(p2);
-            apdu.Lc.Should().Be(checked((byte)apdu.CommandData.Length));
+            apdu.Lc.First().Should().Be(checked((byte)apdu.CommandData.Count()));
             apdu.CommandData.ShouldBeEquivalentTo(commandData);
             apdu.Le.ShouldBeEquivalentTo(new[] { le });
         }

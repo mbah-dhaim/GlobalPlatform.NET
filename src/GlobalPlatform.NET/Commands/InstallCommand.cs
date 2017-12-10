@@ -1,10 +1,11 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -689,7 +690,7 @@ namespace GlobalPlatform.NET.Commands
             }
         }
 
-        public new byte[] AsBytes() => this.AsApdu().Buffer;
+        public new byte[] AsBytes() => this.AsApdu().Buffer.ToArray();
 
         public override IEnumerable<CommandApdu> AsApdus()
         {

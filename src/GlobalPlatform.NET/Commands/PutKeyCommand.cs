@@ -1,13 +1,14 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
-using GlobalPlatform.NET.Commands.Interfaces;
-using GlobalPlatform.NET.Extensions;
-using GlobalPlatform.NET.Reference;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using GlobalPlatform.NET.Commands.Abstractions;
+using GlobalPlatform.NET.Commands.Interfaces;
+using GlobalPlatform.NET.Extensions;
+using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
-using TripleDES = GlobalPlatform.NET.SecureChannel.Cryptography.TripleDES;
+using Iso7816;
+using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Commands
 {

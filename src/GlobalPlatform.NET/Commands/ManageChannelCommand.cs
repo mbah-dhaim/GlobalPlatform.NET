@@ -1,7 +1,8 @@
-﻿using GlobalPlatform.NET.Commands.Abstractions;
+﻿using System;
+using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Reference;
-using System;
+using Iso7816;
 
 namespace GlobalPlatform.NET.Commands
 {
