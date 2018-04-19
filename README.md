@@ -6,6 +6,8 @@ Grab the package from NuGet, which will install all dependencies.
 
 `Install-Package GlobalPlatform.NET`
 
+The library is compiled against .NET Standard 2.0 - [see here](https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-implementation-support) for information on your project's runtime requirements.
+
 ## Usage
 GlobalPlatform.NET is a fluent .NET API for GlobalPlatform smartcards. The API lets you programatically generate APDU commands, interrogate card contents and work with Secure Channels, where the API will manage security such as encryption and MACing.
 
