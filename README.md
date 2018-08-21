@@ -96,4 +96,4 @@ secureChannelSession.SecureApdu(apdu);
 // -> 84-F2-80-00-0A-4F-00-C8-80-21-A2-17-85-DA-7A-00
 ```
 
-
+Session keys can be provided instead of static keys, should you require this.
