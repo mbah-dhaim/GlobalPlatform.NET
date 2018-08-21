@@ -17,10 +17,10 @@ namespace GlobalPlatform.NET.SCP02
     public interface IScp02SessionBuilder
     {
         /// <summary>
-        /// Uses i=15 to configure the SCP02 secure channel. 
+        /// Uses i=15 to configure the SCP02 secure channel.
         /// <para> Based on section E.1.1 of the v2.3 GlobalPlatform Card Specification. </para>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>  </returns>
         IScp02SecurityLevelPicker Option15();
     }
 
@@ -35,65 +35,119 @@ namespace GlobalPlatform.NET.SCP02
         /// Specifies the object containing the 3 secure channel keys that you wish to use for this
         /// secure channel.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="keyObject"></param>
-        /// <param name="encryptionKeySelector"></param>
-        /// <param name="macKeySelector"></param>
-        /// <param name="dataEncryptionKeySelector"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">  </typeparam>
+        /// <param name="keyObject">  </param>
+        /// <param name="encryptionKeySelector">  </param>
+        /// <param name="macKeySelector">  </param>
+        /// <param name="dataEncryptionKeySelector">  </param>
+        /// <returns>  </returns>
         IScp02HostChallengePicker UsingKeysFrom<T>(T keyObject,
             Func<T, IEnumerable<byte>> encryptionKeySelector,
             Func<T, IEnumerable<byte>> macKeySelector,
+            Func<T, IEnumerable<byte>> dataEncryptionKeySelector);
+
+        /// <summary>
+        /// Specifies the object containing the 4 secure channel session keys that you wish to use
+        /// for this secure channel.
+        /// </summary>
+        /// <typeparam name="T">  </typeparam>
+        /// <param name="keyObject">  </param>
+        /// <param name="encryptionKeySelector">  </param>
+        /// <param name="cMacKeySelector">  </param>
+        /// <param name="rMacKeySelector">  </param>
+        /// <param name="dataEncryptionKeySelector">  </param>
+        /// <returns>  </returns>
+        IScp02HostChallengePicker UsingSessionKeysFrom<T>(T keyObject,
+            Func<T, IEnumerable<byte>> encryptionKeySelector,
+            Func<T, IEnumerable<byte>> cMacKeySelector,
+            Func<T, IEnumerable<byte>> rMacKeySelector,
             Func<T, IEnumerable<byte>> dataEncryptionKeySelector);
     }
 
     public interface IScp02EncryptionKeyPicker
     {
         /// <summary>
-        /// Specifies the encryption key that you wish to use for this secure channel. 
+        /// Specifies the encryption key that you wish to use for this secure channel.
         /// </summary>
-        /// <param name="encryptionKey"></param>
-        /// <returns></returns>
+        /// <param name="encryptionKey">  </param>
+        /// <returns>  </returns>
         IScp02MacKeyPicker UsingEncryptionKey(byte[] encryptionKey);
+
+        /// <summary>
+        /// Specifies the encryption session key that you wish to use for this secure channel.
+        /// </summary>
+        /// <param name="encryptionKey">  </param>
+        /// <returns>  </returns>
+        IScp02CMacSessionKeyPicker UsingEncryptionSessionKey(byte[] encryptionKey);
     }
 
     public interface IScp02MacKeyPicker
     {
         /// <summary>
-        /// Specifies the MAC key that you wish to use for this secure channel. 
+        /// Specifies the MAC key that you wish to use for this secure channel.
         /// </summary>
-        /// <param name="macKey"></param>
-        /// <returns></returns>
+        /// <param name="macKey">  </param>
+        /// <returns>  </returns>
         IScp02DataEncryptionKeyPicker AndMacKey(byte[] macKey);
+    }
+
+    public interface IScp02CMacSessionKeyPicker
+    {
+        /// <summary>
+        /// Specifies the C-MAC session key that you wish to use for this secure channel.
+        /// </summary>
+        /// <param name="cMacKey">  </param>
+        /// <returns>  </returns>
+        IScp02RMacSessionKeyPicker AndCMacSessionKey(byte[] cMacKey);
+    }
+
+    public interface IScp02RMacSessionKeyPicker : IScp02DataEncryptionSessionKeyPicker
+    {
+        /// <summary>
+        /// Specifies the R-MAC session key that you wish to use for this secure channel.
+        /// </summary>
+        /// <param name="rMacKey">  </param>
+        /// <returns>  </returns>
+        IScp02DataEncryptionSessionKeyPicker AndRMacSessionKey(byte[] rMacKey);
     }
 
     public interface IScp02DataEncryptionKeyPicker
     {
         /// <summary>
-        /// Specifies the data encryption key that you wish to use for this secure channel. 
+        /// Specifies the data encryption key that you wish to use for this secure channel.
         /// </summary>
-        /// <param name="dataEncryptionKey"></param>
-        /// <returns></returns>
+        /// <param name="dataEncryptionKey">  </param>
+        /// <returns>  </returns>
         IScp02HostChallengePicker AndDataEncryptionKey(byte[] dataEncryptionKey);
+    }
+
+    public interface IScp02DataEncryptionSessionKeyPicker
+    {
+        /// <summary>
+        /// Specifies the data encryption session key that you wish to use for this secure channel.
+        /// </summary>
+        /// <param name="dataEncryptionKey">  </param>
+        /// <returns>  </returns>
+        IScp02HostChallengePicker AndDataEncryptionSessionKey(byte[] dataEncryptionKey);
     }
 
     public interface IScp02HostChallengePicker
     {
         /// <summary>
-        /// The host challenge used in the preceding INITIALIZE UPDATE command. 
+        /// The host challenge used in the preceding INITIALIZE UPDATE command.
         /// </summary>
-        /// <param name="hostChallenge"></param>
-        /// <returns></returns>
+        /// <param name="hostChallenge">  </param>
+        /// <returns>  </returns>
         IScp02InitializeUpdateResponsePicker WithHostChallenge(byte[] hostChallenge);
     }
 
     public interface IScp02InitializeUpdateResponsePicker
     {
         /// <summary>
-        /// The response buffer to the proceeding INITIALIZE UPDATE command. 
+        /// The response buffer to the proceeding INITIALIZE UPDATE command.
         /// </summary>
-        /// <param name="initializeUpdateResponse"></param>
-        /// <returns></returns>
+        /// <param name="initializeUpdateResponse">  </param>
+        /// <returns>  </returns>
         ISecureChannelSessionEstablisher<IScp02SecureChannelSession> AndInitializeUpdateResponse(byte[] initializeUpdateResponse);
     }
 
@@ -103,10 +157,14 @@ namespace GlobalPlatform.NET.SCP02
         IScp02SecurityLevelPicker,
         IScp02KeyPicker,
         IScp02MacKeyPicker,
+        IScp02CMacSessionKeyPicker,
+        IScp02RMacSessionKeyPicker,
         IScp02DataEncryptionKeyPicker,
+        IScp02DataEncryptionSessionKeyPicker,
         IScp02HostChallengePicker,
         IScp02InitializeUpdateResponsePicker
     {
+        private KeyMode keyMode;
         private byte[] encryptionKey;
         private byte[] macKey;
         private byte[] dataEncryptionKey;
@@ -221,8 +279,8 @@ namespace GlobalPlatform.NET.SCP02
         /// CommandData field.
         /// <para> Based on section E.4.4 of the v2.3 GlobalPlatform Card Specification. </para>
         /// </summary>
-        /// <param name="apdu"></param>
-        /// <returns></returns>
+        /// <param name="apdu">  </param>
+        /// <returns>  </returns>
         private static byte[] GetDataForCmac(CommandApdu apdu)
         {
             var apduData = new List<byte> { apdu.CLA, apdu.INS, apdu.P1, apdu.P2 };
@@ -268,9 +326,37 @@ namespace GlobalPlatform.NET.SCP02
             Ensure.HasCount(macKey, nameof(macKey), 16);
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
+            this.keyMode = KeyMode.Static;
+
             this.encryptionKey = encryptionKey;
             this.macKey = macKey;
             this.dataEncryptionKey = dataEncryptionKey;
+
+            return this;
+        }
+
+        public IScp02HostChallengePicker UsingSessionKeysFrom<T>(T keyObject,
+            Func<T, IEnumerable<byte>> encryptionKeySelector,
+            Func<T, IEnumerable<byte>> cMacKeySelector,
+            Func<T, IEnumerable<byte>> rMacKeySelector,
+            Func<T, IEnumerable<byte>> dataEncryptionKeySelector)
+        {
+            var encryptionKey = encryptionKeySelector(keyObject).ToArray();
+            var cMacKey = cMacKeySelector(keyObject).ToArray();
+            var rMacKey = rMacKeySelector(keyObject).ToArray();
+            var dataEncryptionKey = dataEncryptionKeySelector(keyObject).ToArray();
+
+            Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
+            Ensure.HasCount(cMacKey, nameof(cMacKey), 16);
+            Ensure.HasCount(rMacKey, nameof(rMacKey), 16);
+            Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
+
+            this.keyMode = KeyMode.Session;
+
+            this.EncryptionKey = encryptionKey;
+            this.CMacKey = cMacKey;
+            this.RMacKey = rMacKey;
+            this.DataEncryptionKey = dataEncryptionKey;
 
             return this;
         }
@@ -279,7 +365,20 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
 
+            this.keyMode = KeyMode.Static;
+
             this.encryptionKey = encryptionKey;
+
+            return this;
+        }
+
+        public IScp02CMacSessionKeyPicker UsingEncryptionSessionKey(byte[] encryptionKey)
+        {
+            Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
+
+            this.keyMode = KeyMode.Session;
+
+            this.EncryptionKey = encryptionKey;
 
             return this;
         }
@@ -293,11 +392,38 @@ namespace GlobalPlatform.NET.SCP02
             return this;
         }
 
+        public IScp02RMacSessionKeyPicker AndCMacSessionKey(byte[] cMacKey)
+        {
+            Ensure.HasCount(cMacKey, nameof(cMacKey), 16);
+
+            this.CMacKey = cMacKey;
+
+            return this;
+        }
+
+        public IScp02DataEncryptionSessionKeyPicker AndRMacSessionKey(byte[] rMacKey)
+        {
+            Ensure.HasCount(rMacKey, nameof(rMacKey), 16);
+
+            this.RMacKey = rMacKey;
+
+            return this;
+        }
+
         public IScp02HostChallengePicker AndDataEncryptionKey(byte[] dataEncryptionKey)
         {
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
             this.dataEncryptionKey = dataEncryptionKey;
+
+            return this;
+        }
+
+        public IScp02HostChallengePicker AndDataEncryptionSessionKey(byte[] dataEncryptionKey)
+        {
+            Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
+
+            this.DataEncryptionKey = dataEncryptionKey;
 
             return this;
         }
@@ -327,7 +453,11 @@ namespace GlobalPlatform.NET.SCP02
 
         public IScp02SecureChannelSession Establish()
         {
-            this.GenerateSessionKeys();
+            if (this.keyMode == KeyMode.Static)
+            {
+                this.GenerateSessionKeys();
+            }
+
             this.HostCryptogram = this.GenerateCryptogram(CryptogramType.Host);
             this.VerifyCardCryptogram();
 
@@ -392,6 +522,12 @@ namespace GlobalPlatform.NET.SCP02
         {
             Card,
             Host
+        }
+
+        private enum KeyMode
+        {
+            Static,
+            Session
         }
 
         private byte[] GenerateCryptogram(CryptogramType cryptogramType)
