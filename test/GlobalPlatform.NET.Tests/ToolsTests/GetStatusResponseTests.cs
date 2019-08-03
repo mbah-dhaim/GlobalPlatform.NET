@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.ToolsTests
 {
@@ -23,10 +23,10 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
                 .IssuerSecurityDomain()
                 .Parse(response);
 
-            status.AID.ShouldAllBeEquivalentTo(new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 },
+            status.AID.Should().BeEquivalentTo(new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 },
                 o => o.WithStrictOrderingFor(x => x));
             status.LifeCycleState.Should().Be((byte)CardLifeCycleCoding.OpReady);
-            status.Privileges.ShouldAllBeEquivalentTo(0x9E);
+            status.Privileges.Should().BeEquivalentTo(0x9E);
             status.ExecutableLoadFileAID.Should().BeNull();
             status.AssociatedSecurityDomainAID.Should().BeNull();
         }
@@ -48,19 +48,19 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
 
             status.Count.Should().Be(2);
 
-            status.First().AID.ShouldAllBeEquivalentTo(
+            status.First().AID.Should().BeEquivalentTo(
                 new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x01 },
                 o => o.WithStrictOrderingFor(x => x));
             status.First().LifeCycleState.Should().Be((byte)ApplicationLifeCycleCoding.Selectable);
-            status.First().Privileges.ShouldAllBeEquivalentTo(Privileges.Empty);
+            status.First().Privileges.Should().BeEquivalentTo(Privileges.Empty);
             status.First().ExecutableLoadFileAID.Should().BeNull();
             status.First().AssociatedSecurityDomainAID.Should().BeNull();
 
-            status.Last().AID.ShouldAllBeEquivalentTo(
+            status.Last().AID.Should().BeEquivalentTo(
                 new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x81 },
                 o => o.WithStrictOrderingFor(x => x));
             status.Last().LifeCycleState.Should().Be((byte)ApplicationLifeCycleCoding.Selectable);
-            status.Last().Privileges.ShouldAllBeEquivalentTo(Privileges.SecurityDomain);
+            status.Last().Privileges.Should().BeEquivalentTo(Privileges.SecurityDomain);
             status.Last().ExecutableLoadFileAID.Should().BeNull();
             status.Last().AssociatedSecurityDomainAID.Should().BeNull();
         }
@@ -84,13 +84,13 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
 
             status.Count.Should().Be(1);
 
-            status.First().AID.ShouldAllBeEquivalentTo(
+            status.First().AID.Should().BeEquivalentTo(
                 new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x03, 0x53, 0x50 },
                 o => o.WithStrictOrderingFor(x => x));
             status.First().LifeCycleState.Should().Be((byte)ExecutableLoadFileLifeCycleCoding.Installed);
             status.First().ExecutableLoadFileVersionNumber.Should().BeNull();
             status.First().ExecutableModuleAIDs.Count.Should().Be(1);
-            status.First().ExecutableModuleAIDs.First().ShouldAllBeEquivalentTo(
+            status.First().ExecutableModuleAIDs.First().Should().BeEquivalentTo(
                 new byte[] { 0xA0, 0x00, 0x00, 0x00, 0x03, 0x53, 0x50, 0x41 },
                 o => o.WithStrictOrderingFor(x => x));
             status.First().AssociatedSecurityDomainAID.Should().BeNull();

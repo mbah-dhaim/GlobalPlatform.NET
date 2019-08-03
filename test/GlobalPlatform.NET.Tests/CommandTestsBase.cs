@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Iso7816;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Tests
 {
@@ -61,7 +61,8 @@ namespace GlobalPlatform.NET.Tests
             apdu.INS.Should().Be(ins);
             apdu.P1.Should().Be(p1);
             apdu.P2.Should().Be(p2);
-            apdu.Le.ShouldBeEquivalentTo(new[] { le });
+            apdu.Le.Should().BeEquivalentTo(new[] { le });
+            //apdu.Le.ShouldBeEquivalentTo(new[] { le });
         }
 
         /// <summary>
@@ -85,7 +86,8 @@ namespace GlobalPlatform.NET.Tests
             apdu.P1.Should().Be(p1);
             apdu.P2.Should().Be(p2);
             apdu.Lc.First().Should().Be(checked((byte)apdu.CommandData.Count()));
-            apdu.CommandData.ShouldBeEquivalentTo(commandData);
+            apdu.CommandData.Should().BeEquivalentTo(commandData);
+            //apdu.CommandData.ShouldBeEquivalentTo(commandData);
         }
 
         /// <summary>
@@ -111,8 +113,10 @@ namespace GlobalPlatform.NET.Tests
             apdu.P1.Should().Be(p1);
             apdu.P2.Should().Be(p2);
             apdu.Lc.First().Should().Be(checked((byte)apdu.CommandData.Count()));
-            apdu.CommandData.ShouldBeEquivalentTo(commandData);
-            apdu.Le.ShouldBeEquivalentTo(new[] { le });
+            apdu.CommandData.Should().BeEquivalentTo(commandData);
+            //apdu.CommandData.ShouldBeEquivalentTo(commandData);
+            apdu.Le.Should().BeEquivalentTo(new[] { le });
+            //apdu.Le.ShouldBeEquivalentTo(new[] { le });
         }
     }
 }

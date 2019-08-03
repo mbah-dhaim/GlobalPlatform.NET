@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Security.Cryptography;
 using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
@@ -31,15 +31,15 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.PutKey, keyVersion, keyIdentifier, 0x00);
 
-            apdu.Lc.ShouldAllBeEquivalentTo(1 + 3 * 22);
+            apdu.Lc.Should().AllBeEquivalentTo(1 + 3 * 22);
             apdu.CommandData.First().Should().Be(keyVersion);
             apdu.CommandData.Skip(1).Split(22).ForEach(block =>
             {
                 block.First().Should().Be(0x80);
-                block.Skip(1).First().Should().Be(0x10);
-                block.Skip(2).Take(16).ShouldAllBeEquivalentTo(TripleDES.Encrypt(KeyData, encryptionkey, CipherMode.ECB));
+                block.Skip(1).First().Should().Be(0x10);                
+                block.Skip(2).Take(16).Should().BeEquivalentTo(TripleDES.Encrypt(KeyData, encryptionkey, CipherMode.ECB));
                 block.Skip(18).First().Should().Be(0x03);
-                block.Skip(19).ShouldAllBeEquivalentTo(KeyCheckValue.Generate(KeyTypeCoding.DES, KeyData));
+                block.Skip(19).Should().BeEquivalentTo(KeyCheckValue.Generate(KeyTypeCoding.DES, KeyData));
             });
         }
     }

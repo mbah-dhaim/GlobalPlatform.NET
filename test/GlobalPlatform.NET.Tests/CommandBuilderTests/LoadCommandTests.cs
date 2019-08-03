@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 {
@@ -36,7 +36,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
 
             commandData.AddRange(loadFileDataBlockLength);
 
-            apdus.First().CommandData.Take(4).ShouldBeEquivalentTo(commandData);
+            apdus.First().CommandData.Take(4).Should().BeEquivalentTo(commandData);
 
             byte[] dataBlock = apdus.SelectMany(apdu => apdu.CommandData).ToArray();
 
@@ -45,7 +45,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
                 apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
-                apdu.Lc.ShouldAllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
+                apdu.Lc.Should().AllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }
 
@@ -65,11 +65,11 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
             var tlvs = TLV.Parse(apdus.First().CommandData);
 
             tlvs.Count.Should().Be(2);
-            tlvs.First().Tag.ShouldAllBeEquivalentTo((byte)Tag.DapBlock);
+            tlvs.First().Tag.Should().AllBeEquivalentTo((byte)Tag.DapBlock);
             tlvs.Single((byte)Tag.DapBlock).NestedTags.Count.Should().Be(2);
-            tlvs.Single((byte)Tag.DapBlock).NestedTags.First().Tag.ShouldAllBeEquivalentTo((byte)Tag.SecurityDomainAID);
-            tlvs.Single((byte)Tag.DapBlock).NestedTags.Last().Tag.ShouldAllBeEquivalentTo((byte)Tag.LoadFileDataBlockSignature);
-            tlvs.Last().Tag.ShouldAllBeEquivalentTo((byte)Tag.LoadFileDataBlock);
+            tlvs.Single((byte)Tag.DapBlock).NestedTags.First().Tag.Should().AllBeEquivalentTo((byte)Tag.SecurityDomainAID);
+            tlvs.Single((byte)Tag.DapBlock).NestedTags.Last().Tag.Should().AllBeEquivalentTo((byte)Tag.LoadFileDataBlockSignature);
+            tlvs.Last().Tag.Should().AllBeEquivalentTo((byte)Tag.LoadFileDataBlock);
             tlvs.Single((byte)Tag.LoadFileDataBlock).NestedTags.Count.Should().Be(0);
 
             byte[] dataBlock = apdus.SelectMany(apdu => apdu.CommandData).ToArray();
@@ -79,7 +79,7 @@ namespace GlobalPlatform.NET.Tests.CommandBuilderTests
                 byte p1 = isLast ? (byte)0x80 : (byte)0x00;
 
                 apdu.Assert(ApduClass.GlobalPlatform, ApduInstruction.Load, p1, (byte)index);
-                apdu.Lc.ShouldAllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
+                apdu.Lc.Should().AllBeEquivalentTo((byte)(isLast ? dataBlock.Length % blockSize : blockSize));
             });
         }
     }

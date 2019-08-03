@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GlobalPlatform.NET.Exceptions;
+﻿using GlobalPlatform.NET.Exceptions;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Interfaces;
 using GlobalPlatform.NET.Reference;
@@ -9,6 +6,9 @@ using GlobalPlatform.NET.SCP02.Cryptography;
 using GlobalPlatform.NET.SCP02.Interfaces;
 using GlobalPlatform.NET.SCP02.Reference;
 using Iso7816;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using DES = GlobalPlatform.NET.Cryptography.DES;
 using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
@@ -170,13 +170,13 @@ namespace GlobalPlatform.NET.SCP02
         private byte[] dataEncryptionKey;
         private byte[] initializeUpdateResponse;
 
-        public byte[] SequenceCounter => this.initializeUpdateResponse.Skip(12).Take(2).ToArray();
+        public byte[] SequenceCounter => initializeUpdateResponse.Skip(12).Take(2).ToArray();
 
-        public byte[] CardChallenge => this.initializeUpdateResponse.Skip(14).Take(6).ToArray();
+        public byte[] CardChallenge => initializeUpdateResponse.Skip(14).Take(6).ToArray();
 
         public byte[] HostChallenge { get; private set; }
 
-        public byte[] CardCryptogram => this.initializeUpdateResponse.Skip(20).Take(8).ToArray();
+        public byte[] CardCryptogram => initializeUpdateResponse.Skip(20).Take(8).ToArray();
 
         public bool IsEstablished { get; private set; }
 
@@ -218,45 +218,54 @@ namespace GlobalPlatform.NET.SCP02
                 return apdu;
             }
 
-            if (this.SecurityLevel.HasFlag(SecurityLevel.CMac) || apdu.INS == ApduInstruction.ExternalAuthenticate)
+            if (SecurityLevel.HasFlag(SecurityLevel.CMac) || apdu.INS == ApduInstruction.ExternalAuthenticate)
             {
+                byte cla = apdu.CLA;
                 switch (classByteCoding)
                 {
                     case ApduClass.ByteCoding.First:
-                        apdu.CLA = apdu.CLA |= 0b00000100;
+                        //apdu.CLA = apdu.CLA |= 0b00000100;
+                        cla = cla |= 0b00000100;
                         break;
 
                     case ApduClass.ByteCoding.InterIndustry:
-                        apdu.CLA = apdu.CLA |= 0b00100000;
+                        //apdu.CLA = apdu.CLA |= 0b00100000;
+                        cla = cla |= 0b00100000;
                         break;
 
                     default:
                         throw new InvalidOperationException("APDU does not use either First or Interindustry Class Byte coding.");
                 }
 
-                var mac = this.GenerateCmac(apdu);
+                var mac = GenerateCmac(apdu);
 
                 var data = new List<byte>();
                 data.AddRange(apdu.CommandData);
                 data.AddRange(mac);
 
-                apdu.CommandData = data.ToArray();
+                //apdu.CommandData = data.ToArray();
+                //recreate apdu
+                //apdu = CommandApdu.Case4S(cla, apdu.INS, apdu.P1, apdu.P2, data.ToArray(), apdu.Le.ToArray()[0]);
+                apdu = CommandApdu.Case3S(cla, apdu.INS, apdu.P1, apdu.P2, data.ToArray());
             }
 
-            if (this.SecurityLevel.HasFlag(SecurityLevel.CDecryption) && apdu.INS != ApduInstruction.ExternalAuthenticate)
+            if (SecurityLevel.HasFlag(SecurityLevel.CDecryption) && apdu.INS != ApduInstruction.ExternalAuthenticate)
             {
                 var commandData = apdu.CommandData.Take(apdu.CommandData.Count() - 8).ToList();
                 var mac = apdu.CommandData.TakeLast(8);
 
                 byte[] padded = commandData.Pad().ToArray();
 
-                byte[] encrypted = TripleDES.Encrypt(padded, this.EncryptionKey);
+                byte[] encrypted = TripleDES.Encrypt(padded, EncryptionKey);
 
                 var data = new List<byte>();
                 data.AddRange(encrypted);
                 data.AddRange(mac);
 
-                apdu.CommandData = data.ToArray();
+                //apdu.CommandData = data.ToArray();
+                //recreate apdu
+                //apdu = CommandApdu.Case4S(apdu.CLA, apdu.INS, apdu.P1, apdu.P2, data.ToArray(), apdu.Le.ToArray()[0]);
+                apdu = CommandApdu.Case3S(apdu.CLA, apdu.INS, apdu.P1, apdu.P2, data.ToArray());
             }
 
             return apdu;
@@ -264,13 +273,13 @@ namespace GlobalPlatform.NET.SCP02
 
         private byte[] GenerateCmac(CommandApdu apdu)
         {
-            byte[] icv = this.CMac.All(x => x == 0x00) ? this.CMac : DES.Encrypt(this.CMac, this.CMacKey.Take(8).ToArray());
+            byte[] icv = CMac.All(x => x == 0x00) ? CMac : DES.Encrypt(CMac, CMacKey.Take(8).ToArray());
 
             var data = GetDataForCmac(apdu);
 
-            byte[] mac = MAC.Algorithm3(data, this.CMacKey, icv);
+            byte[] mac = MAC.Algorithm3(data, CMacKey, icv);
 
-            return this.CMac = mac;
+            return CMac = mac;
         }
 
         /// <summary>
@@ -295,20 +304,15 @@ namespace GlobalPlatform.NET.SCP02
             return padded;
         }
 
-        public IEnumerable<CommandApdu> SecureApdu(params CommandApdu[] apdus)
-            => apdus.Select(this.SecureApdu);
+        public IEnumerable<CommandApdu> SecureApdu(params CommandApdu[] apdus) => apdus.Select(SecureApdu);
 
-        public IEnumerable<CommandApdu> SecureApdu(IEnumerable<CommandApdu> apdus)
-            => this.SecureApdu(apdus.ToArray());
+        public IEnumerable<CommandApdu> SecureApdu(IEnumerable<CommandApdu> apdus) => SecureApdu(apdus.ToArray());
 
-        public IScp02SecurityLevelPicker Option15()
-        {
-            return this;
-        }
+        public IScp02SecurityLevelPicker Option15() => this;
 
         public IScp02KeyPicker ChangeSecurityLevelTo(SecurityLevel securityLevel)
         {
-            this.SecurityLevel = securityLevel;
+            SecurityLevel = securityLevel;
 
             return this;
         }
@@ -326,7 +330,7 @@ namespace GlobalPlatform.NET.SCP02
             Ensure.HasCount(macKey, nameof(macKey), 16);
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
-            this.keyMode = KeyMode.Static;
+            keyMode = KeyMode.Static;
 
             this.encryptionKey = encryptionKey;
             this.macKey = macKey;
@@ -351,12 +355,12 @@ namespace GlobalPlatform.NET.SCP02
             Ensure.HasCount(rMacKey, nameof(rMacKey), 16);
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
-            this.keyMode = KeyMode.Session;
+            keyMode = KeyMode.Session;
 
-            this.EncryptionKey = encryptionKey;
-            this.CMacKey = cMacKey;
-            this.RMacKey = rMacKey;
-            this.DataEncryptionKey = dataEncryptionKey;
+            EncryptionKey = encryptionKey;
+            CMacKey = cMacKey;
+            RMacKey = rMacKey;
+            DataEncryptionKey = dataEncryptionKey;
 
             return this;
         }
@@ -365,7 +369,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
 
-            this.keyMode = KeyMode.Static;
+            keyMode = KeyMode.Static;
 
             this.encryptionKey = encryptionKey;
 
@@ -376,9 +380,9 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(encryptionKey, nameof(encryptionKey), 16);
 
-            this.keyMode = KeyMode.Session;
+            keyMode = KeyMode.Session;
 
-            this.EncryptionKey = encryptionKey;
+            EncryptionKey = encryptionKey;
 
             return this;
         }
@@ -396,7 +400,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(cMacKey, nameof(cMacKey), 16);
 
-            this.CMacKey = cMacKey;
+            CMacKey = cMacKey;
 
             return this;
         }
@@ -405,7 +409,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(rMacKey, nameof(rMacKey), 16);
 
-            this.RMacKey = rMacKey;
+            RMacKey = rMacKey;
 
             return this;
         }
@@ -423,7 +427,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(dataEncryptionKey, nameof(dataEncryptionKey), 16);
 
-            this.DataEncryptionKey = dataEncryptionKey;
+            DataEncryptionKey = dataEncryptionKey;
 
             return this;
         }
@@ -432,7 +436,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             Ensure.HasCount(hostChallenge, nameof(hostChallenge), 8);
 
-            this.HostChallenge = hostChallenge;
+            HostChallenge = hostChallenge;
 
             return this;
         }
@@ -453,15 +457,15 @@ namespace GlobalPlatform.NET.SCP02
 
         public IScp02SecureChannelSession Establish()
         {
-            if (this.keyMode == KeyMode.Static)
+            if (keyMode == KeyMode.Static)
             {
-                this.GenerateSessionKeys();
+                GenerateSessionKeys();
             }
 
-            this.HostCryptogram = this.GenerateCryptogram(CryptogramType.Host);
-            this.VerifyCardCryptogram();
+            HostCryptogram = GenerateCryptogram(CryptogramType.Host);
+            VerifyCardCryptogram();
 
-            this.IsEstablished = true;
+            IsEstablished = true;
 
             return this;
         }
@@ -470,7 +474,7 @@ namespace GlobalPlatform.NET.SCP02
         {
             try
             {
-                this.Establish();
+                Establish();
             }
             catch
             {
@@ -479,34 +483,33 @@ namespace GlobalPlatform.NET.SCP02
 
             secureChannelSession = this;
 
-            return this.IsEstablished;
+            return IsEstablished;
         }
 
         private void GenerateSessionKeys()
         {
-            this.EncryptionKey = this.GenerateSessionKey(SessionKeyType.SEnc, this.encryptionKey);
-            this.CMacKey = this.GenerateSessionKey(SessionKeyType.CMac, this.macKey);
-            this.RMacKey = this.GenerateSessionKey(SessionKeyType.RMac, this.macKey);
-            this.DataEncryptionKey = this.GenerateSessionKey(SessionKeyType.Dek, this.dataEncryptionKey);
+            EncryptionKey = GenerateSessionKey(SessionKeyType.SEnc, encryptionKey);
+            CMacKey = GenerateSessionKey(SessionKeyType.CMac, macKey);
+            RMacKey = GenerateSessionKey(SessionKeyType.RMac, macKey);
+            DataEncryptionKey = GenerateSessionKey(SessionKeyType.Dek, dataEncryptionKey);
         }
 
         private byte[] GenerateDerivationData(SessionKeyType sessionKeyType)
         {
             var data = new List<byte> { 0x01, (byte)sessionKeyType };
 
-            data.AddRange(this.SequenceCounter);
+            data.AddRange(SequenceCounter);
             data.AddRange(Enumerable.Repeat<byte>(0x00, 12));
 
             return data.ToArray();
         }
 
-        private byte[] GenerateSessionKey(SessionKeyType sessionKeyType, byte[] staticKey)
-            => TripleDES.Encrypt(this.GenerateDerivationData(sessionKeyType), staticKey);
+        private byte[] GenerateSessionKey(SessionKeyType sessionKeyType, byte[] staticKey) => TripleDES.Encrypt(GenerateDerivationData(sessionKeyType), staticKey);
 
         private void VerifyCardCryptogram()
         {
-            var fromCard = this.CardCryptogram;
-            var generated = this.GenerateCryptogram(CryptogramType.Card);
+            var fromCard = CardCryptogram;
+            var generated = GenerateCryptogram(CryptogramType.Card);
 
             if (!fromCard.SequenceEqual(generated))
             {
@@ -537,21 +540,21 @@ namespace GlobalPlatform.NET.SCP02
             switch (cryptogramType)
             {
                 case CryptogramType.Card:
-                    data.AddRange(this.HostChallenge);
-                    data.AddRange(this.SequenceCounter);
-                    data.AddRange(this.CardChallenge);
+                    data.AddRange(HostChallenge);
+                    data.AddRange(SequenceCounter);
+                    data.AddRange(CardChallenge);
                     break;
 
                 case CryptogramType.Host:
-                    data.AddRange(this.SequenceCounter);
-                    data.AddRange(this.CardChallenge);
-                    data.AddRange(this.HostChallenge);
+                    data.AddRange(SequenceCounter);
+                    data.AddRange(CardChallenge);
+                    data.AddRange(HostChallenge);
                     break;
             }
 
             data.Pad();
 
-            byte[] cryptogram = MAC.Algorithm1(data.ToArray(), this.EncryptionKey);
+            byte[] cryptogram = MAC.Algorithm1(data.ToArray(), EncryptionKey);
 
             return cryptogram;
         }

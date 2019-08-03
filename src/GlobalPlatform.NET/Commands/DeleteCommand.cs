@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GlobalPlatform.NET.Commands.Abstractions;
+﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Iso7816;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -73,14 +73,14 @@ namespace GlobalPlatform.NET.Commands
 
         public IDeleteCommandApplicationPicker DeleteCardContent()
         {
-            this.scope = DeleteCommandScope.CardContent;
+            scope = DeleteCommandScope.CardContent;
 
             return this;
         }
 
         public IDeleteCommandKeyPicker DeleteKey()
         {
-            this.scope = DeleteCommandScope.Key;
+            scope = DeleteCommandScope.Key;
 
             return this;
         }
@@ -97,14 +97,14 @@ namespace GlobalPlatform.NET.Commands
         {
             Ensure.IsAID(aid, nameof(aid));
 
-            this.application = aid;
+            application = aid;
 
             return this;
         }
 
         public IDeleteCommandTokenPicker AndRelatedObjects()
         {
-            this.P2 = 0b10000000;
+            P2 = 0b10000000;
 
             return this;
         }
@@ -134,7 +134,7 @@ namespace GlobalPlatform.NET.Commands
                 throw new ArgumentException("Identifier must be between 1-7F (inclusive).", nameof(identifier));
             }
 
-            this.keyIdentifier = identifier;
+            keyIdentifier = identifier;
 
             return this;
         }
@@ -155,45 +155,48 @@ namespace GlobalPlatform.NET.Commands
                 throw new ArgumentException("Version number must be between 1-7F (inclusive).", nameof(versionNumber));
             }
 
-            this.keyVersionNumber = versionNumber;
+            keyVersionNumber = versionNumber;
 
             return this;
         }
 
         public override CommandApdu AsApdu()
         {
-            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.Delete, this.P1, this.P2, 0x00);
+            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.Delete, P1, P2, 0x00);
 
             var data = new List<byte>();
 
-            switch (this.scope)
+            switch (scope)
             {
                 case DeleteCommandScope.CardContent:
-                    data.AddTLV(TLV.Build((byte)Tag.ExecutableLoadFileOrApplicationAID, this.application));
+                    data.AddTLV(TLV.Build((byte)Tag.ExecutableLoadFileOrApplicationAID, application));
 
-                    if (this.token.Any())
+                    if (token.Any())
                     {
-                        data.AddTLV(TLV.Build((byte)Tag.DeleteToken, this.token));
+                        data.AddTLV(TLV.Build((byte)Tag.DeleteToken, token));
                     }
                     break;
 
                 case DeleteCommandScope.Key:
-                    if (this.keyIdentifier == 0 && this.keyVersionNumber == 0)
+                    if (keyIdentifier == 0 && keyVersionNumber == 0)
                     {
                         throw new InvalidOperationException("A key identifier or key version number must be specified.");
                     }
-                    if (this.keyIdentifier > 0)
+                    if (keyIdentifier > 0)
                     {
-                        data.AddTLV(TLV.Build((byte)Tag.KeyIdentifier, this.keyIdentifier));
+                        data.AddTLV(TLV.Build((byte)Tag.KeyIdentifier, keyIdentifier));
                     }
-                    if (this.keyVersionNumber > 0)
+                    if (keyVersionNumber > 0)
                     {
-                        data.AddTLV(TLV.Build((byte)Tag.KeyVersionNumber, this.keyVersionNumber));
+                        data.AddTLV(TLV.Build((byte)Tag.KeyVersionNumber, keyVersionNumber));
                     }
                     break;
             }
-
-            apdu.CommandData = data.ToArray();
+            if (data.Count > 0)
+            {
+                apdu = CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.Delete, P1, P2, data.ToArray(), 0x00);
+            }
+            //apdu.CommandData = data.ToArray();
 
             return apdu;
         }

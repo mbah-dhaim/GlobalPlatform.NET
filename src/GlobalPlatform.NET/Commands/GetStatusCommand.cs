@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using GlobalPlatform.NET.Commands.Abstractions;
+﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Iso7816;
+using System.Collections.Generic;
 
 namespace GlobalPlatform.NET.Commands
 {
@@ -52,7 +52,7 @@ namespace GlobalPlatform.NET.Commands
 
         public IGetStatusApplicationFilter GetStatusOf(GetStatusScope scope)
         {
-            this.P1 = (byte)scope;
+            P1 = (byte)scope;
 
             return this;
         }
@@ -66,25 +66,23 @@ namespace GlobalPlatform.NET.Commands
             return this;
         }
 
-        public IApduBuilder ReturnFirstOrAllOccurrences() => this;
+        public IApduBuilder ReturnFirstOrAllOccurrences()
+        {
+            return this;
+        }
 
         public IApduBuilder ReturnNextOccurrence()
         {
-            this.P2 |= 0b00000001;
+            P2 |= 0b00000001;
 
             return this;
         }
 
         public override CommandApdu AsApdu()
         {
-            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, this.P1, this.P2 |= 0b00000010, 0x00);
-
             var data = new List<byte>();
-
-            data.AddTLV(TLV.Build((byte)Tag.ApplicationAID, this.applicationFilter));
-
-            apdu.CommandData = data.ToArray();
-
+            data.AddTLV(TLV.Build((byte)Tag.ApplicationAID, applicationFilter));
+            var apdu = CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.GetStatus, P1, P2 |= 0b00000010, data.ToArray(), 0x00);
             return apdu;
         }
     }

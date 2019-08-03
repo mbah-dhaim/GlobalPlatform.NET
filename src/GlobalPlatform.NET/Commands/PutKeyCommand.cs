@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using GlobalPlatform.NET.Commands.Abstractions;
+﻿using GlobalPlatform.NET.Commands.Abstractions;
 using GlobalPlatform.NET.Commands.Interfaces;
 using GlobalPlatform.NET.Extensions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.Tools;
 using Iso7816;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
 using TripleDES = GlobalPlatform.NET.Cryptography.TripleDES;
 
 namespace GlobalPlatform.NET.Commands
@@ -117,7 +117,7 @@ namespace GlobalPlatform.NET.Commands
         {
             Ensure.HasCount(key, nameof(key), 16);
 
-            this.key1 = (keyType, key);
+            key1 = (keyType, key);
 
             return this;
         }
@@ -126,7 +126,7 @@ namespace GlobalPlatform.NET.Commands
         {
             Ensure.HasCount(key, nameof(key), 16);
 
-            this.key2 = (keyType, key);
+            key2 = (keyType, key);
 
             return this;
         }
@@ -135,38 +135,35 @@ namespace GlobalPlatform.NET.Commands
         {
             Ensure.HasCount(key, nameof(key), 16);
 
-            this.key3 = (keyType, key);
+            key3 = (keyType, key);
 
             return this;
         }
 
         public override CommandApdu AsApdu()
         {
-            var apdu = CommandApdu.Case2S(ApduClass.GlobalPlatform, ApduInstruction.PutKey, this.keyVersion, this.keyIdentifier, 0x00);
 
-            var data = new List<byte> { this.keyVersion };
+            var data = new List<byte> { keyVersion };
 
-            data.Add((byte)this.key1.KeyType);
-            data.AddRangeWithLength(TripleDES.Encrypt(this.key1.Value, this.encryptionKey, CipherMode.ECB));
-            data.AddRangeWithLength(KeyCheckValue.Generate(this.key1.KeyType, this.key1.Value));
+            data.Add((byte)key1.KeyType);
+            data.AddRangeWithLength(TripleDES.Encrypt(key1.Value, encryptionKey, CipherMode.ECB));
+            data.AddRangeWithLength(KeyCheckValue.Generate(key1.KeyType, key1.Value));
 
-            if (this.key2.Value.Any())
+            if (key2.Value.Any())
             {
-                data.Add((byte)this.key2.KeyType);
-                data.AddRangeWithLength(TripleDES.Encrypt(this.key2.Value, this.encryptionKey, CipherMode.ECB));
-                data.AddRangeWithLength(KeyCheckValue.Generate(this.key2.KeyType, this.key2.Value));
+                data.Add((byte)key2.KeyType);
+                data.AddRangeWithLength(TripleDES.Encrypt(key2.Value, encryptionKey, CipherMode.ECB));
+                data.AddRangeWithLength(KeyCheckValue.Generate(key2.KeyType, key2.Value));
             }
 
-            if (this.key3.Value.Any())
+            if (key3.Value.Any())
             {
-                data.Add((byte)this.key3.KeyType);
-                data.AddRangeWithLength(TripleDES.Encrypt(this.key3.Value, this.encryptionKey, CipherMode.ECB));
-                data.AddRangeWithLength(KeyCheckValue.Generate(this.key3.KeyType, this.key3.Value));
+                data.Add((byte)key3.KeyType);
+                data.AddRangeWithLength(TripleDES.Encrypt(key3.Value, encryptionKey, CipherMode.ECB));
+                data.AddRangeWithLength(KeyCheckValue.Generate(key3.KeyType, key3.Value));
             }
 
-            apdu.CommandData = data.ToArray();
-
-            return apdu;
+            return CommandApdu.Case4S(ApduClass.GlobalPlatform, ApduInstruction.PutKey, keyVersion, keyIdentifier, data.ToArray(), 0x00);
         }
     }
 }

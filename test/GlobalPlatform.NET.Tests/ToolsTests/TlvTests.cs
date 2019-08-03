@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Tools;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.ToolsTests
 {
@@ -15,10 +15,10 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
         {
             var tlv = TLV.Build(0x4F, 0xDD, 0xDD);
 
-            tlv.Tag.ShouldAllBeEquivalentTo(0x4F);
+            tlv.Tag.Should().BeEquivalentTo(0x4F);
             tlv.Length.Should().Be(2);
-            tlv.Value.ShouldAllBeEquivalentTo(new byte[] { 0xDD, 0xDD });
-            tlv.Data.ShouldAllBeEquivalentTo(new byte[] { 0x4F, 0x02, 0xDD, 0xDD }, o => o.WithStrictOrderingFor(x => x));
+            tlv.Value.Should().BeEquivalentTo(new byte[] { 0xDD, 0xDD });
+            tlv.Data.Should().BeEquivalentTo(new byte[] { 0x4F, 0x02, 0xDD, 0xDD }, o => o.WithStrictOrderingFor(x => x));
         }
 
         [TestMethod]
@@ -35,10 +35,10 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
             };
             data.AddRange(new byte[1000]);
 
-            tlv.Tag.ShouldAllBeEquivalentTo(0x4F);
+            tlv.Tag.Should().BeEquivalentTo(0x4F);
             tlv.Length.Should().Be(1000);
-            tlv.Value.ShouldAllBeEquivalentTo(new byte[1000]);
-            tlv.Data.ShouldAllBeEquivalentTo(data, o => o.WithStrictOrderingFor(x => x));
+            tlv.Value.Should().BeEquivalentTo(new byte[1000]);
+            tlv.Data.Should().BeEquivalentTo(data, o => o.WithStrictOrderingFor(x => x));
         }
 
         [TestMethod]
@@ -49,9 +49,9 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
             var tags = TLV.Parse(tlv.Data);
 
             tags.Count.Should().Be(1);
-            tags.First().Tag.ShouldAllBeEquivalentTo(0x4F);
+            tags.First().Tag.Should().BeEquivalentTo(0x4F);
             tags.First().Length.Should().Be(2);
-            tags.First().Value.ShouldAllBeEquivalentTo(new byte[] { 0xDD, 0xDD });
+            tags.First().Value.Should().BeEquivalentTo(new byte[] { 0xDD, 0xDD });
         }
 
         [TestMethod]
@@ -62,9 +62,9 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
             var tlvs = TLV.Parse(data);
 
             tlvs.Count.Should().Be(1);
-            tlvs.First().Tag.ShouldAllBeEquivalentTo(0x4F);
+            tlvs.First().Tag.Should().BeEquivalentTo(0x4F);
             tlvs.First().Length.Should().Be(2);
-            tlvs.First().Value.ShouldAllBeEquivalentTo(new byte[] { 0xDD, 0xDD });
+            tlvs.First().Value.Should().BeEquivalentTo(new byte[] { 0xDD, 0xDD });
         }
 
         [TestMethod]
@@ -75,12 +75,12 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
             var tlvs = TLV.Parse(data);
 
             tlvs.Count.Should().Be(1);
-            tlvs.First().Tag.ShouldAllBeEquivalentTo(0xE3);
+            tlvs.First().Tag.Should().BeEquivalentTo(0xE3);
             tlvs.First().Length.Should().Be(4);
             tlvs.First().NestedTags.Count.Should().Be(1);
-            tlvs.First().NestedTags.First().Tag.ShouldAllBeEquivalentTo(0x4F);
+            tlvs.First().NestedTags.First().Tag.Should().BeEquivalentTo(0x4F);
             tlvs.First().NestedTags.First().Length.Should().Be(2);
-            tlvs.First().NestedTags.First().Value.ShouldAllBeEquivalentTo(new byte[] { 0xDD, 0xDD });
+            tlvs.First().NestedTags.First().Value.Should().BeEquivalentTo(new byte[] { 0xDD, 0xDD });
         }
 
         [TestMethod]
@@ -91,12 +91,12 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
             var tlvs = TLV.Parse(data);
 
             tlvs.Count.Should().Be(1);
-            tlvs.First().Tag.ShouldAllBeEquivalentTo(0xE3);
+            tlvs.First().Tag.Should().BeEquivalentTo(0xE3);
             tlvs.First().Length.Should().Be(4);
             tlvs.First().NestedTags.Count.Should().Be(1);
-            tlvs.First().NestedTags.First().Tag.ShouldAllBeEquivalentTo(0x4F);
+            tlvs.First().NestedTags.First().Tag.Should().BeEquivalentTo(0x4F);
             tlvs.First().NestedTags.First().Length.Should().Be(2);
-            tlvs.First().NestedTags.First().Value.ShouldAllBeEquivalentTo(new byte[] { 0xDD, 0xDD });
+            tlvs.First().NestedTags.First().Value.Should().BeEquivalentTo(new byte[] { 0xDD, 0xDD });
         }
 
         [TestMethod]
@@ -107,7 +107,7 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
                 TLV.Build(0x4F, TLV.Build(0x4F));
             };
 
-            action.ShouldThrow<ArgumentException>();
+            action.Should().Throw<ArgumentException>();
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
                 TLV.Parse(data);
             };
 
-            action.ShouldThrow<NotSupportedException>();
+            action.Should().Throw<NotSupportedException>();
         }
     }
 }

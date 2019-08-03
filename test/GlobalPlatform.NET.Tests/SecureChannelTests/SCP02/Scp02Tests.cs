@@ -1,11 +1,11 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Commands;
 using GlobalPlatform.NET.Exceptions;
 using GlobalPlatform.NET.Reference;
 using GlobalPlatform.NET.SCP02.Reference;
 using Iso7816;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
 {
@@ -42,11 +42,11 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                 .Should()
                 .BeTrue();
 
-            secureChannelSession.EncryptionKey.ShouldBeEquivalentTo(new byte[] { 0x01, 0x0B, 0x03, 0x71, 0xD7, 0x83, 0x77, 0xB8, 0x01, 0xF2, 0xD6, 0x2A, 0xFC, 0x67, 0x1D, 0x95 });
-            secureChannelSession.CMacKey.ShouldBeEquivalentTo(new byte[] { 0xD1, 0xC2, 0x8C, 0x60, 0x16, 0x52, 0xA4, 0x77, 0x0D, 0x67, 0xAD, 0x82, 0xD2, 0xD2, 0xE1, 0xC4 });
-            secureChannelSession.RMacKey.ShouldBeEquivalentTo(new byte[] { 0xFF, 0xAE, 0xC7, 0xEC, 0x7F, 0xAD, 0x69, 0xF9, 0xFB, 0xFF, 0x09, 0x3B, 0xF2, 0xF7, 0x9C, 0x45 });
-            secureChannelSession.DataEncryptionKey.ShouldBeEquivalentTo(new byte[] { 0xE1, 0x19, 0x87, 0xEE, 0x33, 0x1B, 0x41, 0x7A, 0x5D, 0x67, 0xD7, 0x60, 0x69, 0x2F, 0x89, 0xD4 });
-            secureChannelSession.HostCryptogram.ShouldBeEquivalentTo(new byte[] { 0xE4, 0x47, 0x69, 0xBB, 0xAA, 0xF7, 0x5A, 0x6A });
+            secureChannelSession.EncryptionKey.Should().BeEquivalentTo(new byte[] { 0x01, 0x0B, 0x03, 0x71, 0xD7, 0x83, 0x77, 0xB8, 0x01, 0xF2, 0xD6, 0x2A, 0xFC, 0x67, 0x1D, 0x95 });
+            secureChannelSession.CMacKey.Should().BeEquivalentTo(new byte[] { 0xD1, 0xC2, 0x8C, 0x60, 0x16, 0x52, 0xA4, 0x77, 0x0D, 0x67, 0xAD, 0x82, 0xD2, 0xD2, 0xE1, 0xC4 });
+            secureChannelSession.RMacKey.Should().BeEquivalentTo(new byte[] { 0xFF, 0xAE, 0xC7, 0xEC, 0x7F, 0xAD, 0x69, 0xF9, 0xFB, 0xFF, 0x09, 0x3B, 0xF2, 0xF7, 0x9C, 0x45 });
+            secureChannelSession.DataEncryptionKey.Should().BeEquivalentTo(new byte[] { 0xE1, 0x19, 0x87, 0xEE, 0x33, 0x1B, 0x41, 0x7A, 0x5D, 0x67, 0xD7, 0x60, 0x69, 0x2F, 0x89, 0xD4 });
+            secureChannelSession.HostCryptogram.Should().BeEquivalentTo(new byte[] { 0xE4, 0x47, 0x69, 0xBB, 0xAA, 0xF7, 0x5A, 0x6A });
         }
 
         [TestMethod]
@@ -74,11 +74,11 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                 .Should()
                 .BeTrue();
 
-            secureChannelSession.EncryptionKey.ShouldBeEquivalentTo(new byte[] { 0x01, 0x0B, 0x03, 0x71, 0xD7, 0x83, 0x77, 0xB8, 0x01, 0xF2, 0xD6, 0x2A, 0xFC, 0x67, 0x1D, 0x95 });
-            secureChannelSession.CMacKey.ShouldBeEquivalentTo(new byte[] { 0xD1, 0xC2, 0x8C, 0x60, 0x16, 0x52, 0xA4, 0x77, 0x0D, 0x67, 0xAD, 0x82, 0xD2, 0xD2, 0xE1, 0xC4 });
-            secureChannelSession.RMacKey.ShouldBeEquivalentTo(new byte[] { 0xFF, 0xAE, 0xC7, 0xEC, 0x7F, 0xAD, 0x69, 0xF9, 0xFB, 0xFF, 0x09, 0x3B, 0xF2, 0xF7, 0x9C, 0x45 });
-            secureChannelSession.DataEncryptionKey.ShouldBeEquivalentTo(new byte[] { 0xE1, 0x19, 0x87, 0xEE, 0x33, 0x1B, 0x41, 0x7A, 0x5D, 0x67, 0xD7, 0x60, 0x69, 0x2F, 0x89, 0xD4 });
-            secureChannelSession.HostCryptogram.ShouldBeEquivalentTo(new byte[] { 0xE4, 0x47, 0x69, 0xBB, 0xAA, 0xF7, 0x5A, 0x6A });
+            secureChannelSession.EncryptionKey.Should().BeEquivalentTo(new byte[] { 0x01, 0x0B, 0x03, 0x71, 0xD7, 0x83, 0x77, 0xB8, 0x01, 0xF2, 0xD6, 0x2A, 0xFC, 0x67, 0x1D, 0x95 });
+            secureChannelSession.CMacKey.Should().BeEquivalentTo(new byte[] { 0xD1, 0xC2, 0x8C, 0x60, 0x16, 0x52, 0xA4, 0x77, 0x0D, 0x67, 0xAD, 0x82, 0xD2, 0xD2, 0xE1, 0xC4 });
+            secureChannelSession.RMacKey.Should().BeEquivalentTo(new byte[] { 0xFF, 0xAE, 0xC7, 0xEC, 0x7F, 0xAD, 0x69, 0xF9, 0xFB, 0xFF, 0x09, 0x3B, 0xF2, 0xF7, 0x9C, 0x45 });
+            secureChannelSession.DataEncryptionKey.Should().BeEquivalentTo(new byte[] { 0xE1, 0x19, 0x87, 0xEE, 0x33, 0x1B, 0x41, 0x7A, 0x5D, 0x67, 0xD7, 0x60, 0x69, 0x2F, 0x89, 0xD4 });
+            secureChannelSession.HostCryptogram.Should().BeEquivalentTo(new byte[] { 0xE4, 0x47, 0x69, 0xBB, 0xAA, 0xF7, 0x5A, 0x6A });
         }
 
         [TestMethod]
@@ -107,12 +107,12 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                 .GetStatusOf(GetStatusScope.IssuerSecurityDomain)
                 .AsApdu();
 
-            apdu.Lc.ShouldAllBeEquivalentTo(2);
+            apdu.Lc.Should().AllBeEquivalentTo(2);
 
             var securedApdu = secureChannelSession.SecureApdu(apdu);
 
             securedApdu.CLA.Should().Be(ApduClass.SecureMessaging);
-            securedApdu.Lc.ShouldAllBeEquivalentTo(10);
+            securedApdu.Lc.Should().AllBeEquivalentTo(10);
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                 .Scp02()
                 .Option15()
                 .ChangeSecurityLevelTo(SecurityLevel.CDecryption)
-                .UsingKeysFrom(Keys, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key1, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key2, ((byte[]Key1, byte[]Key2, byte[]Key3) k) => k.Key3)
+                .UsingKeysFrom(Keys, ((byte[] Key1, byte[] Key2, byte[] Key3) k) => k.Key1, ((byte[] Key1, byte[] Key2, byte[] Key3) k) => k.Key2, ((byte[] Key1, byte[] Key2, byte[] Key3) k) => k.Key3)
                 .WithHostChallenge(hostChallenge)
                 .AndInitializeUpdateResponse(initializeUpdateResponse)
                 .Establish();
@@ -139,12 +139,12 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                 .GetStatusOf(GetStatusScope.IssuerSecurityDomain)
                 .AsApdu();
 
-            apdu.Lc.ShouldAllBeEquivalentTo(2);
+            apdu.Lc.Should().AllBeEquivalentTo(2);
 
             var securedApdu = secureChannelSession.SecureApdu(apdu);
 
             securedApdu.CLA.Should().Be(ApduClass.SecureMessaging);
-            securedApdu.Lc.ShouldAllBeEquivalentTo(16);
+            securedApdu.Lc.Should().AllBeEquivalentTo(16);
         }
 
         [TestMethod]
@@ -170,7 +170,7 @@ namespace GlobalPlatform.NET.Tests.SecureChannelTests.SCP02
                     .Establish();
             };
 
-            action.ShouldThrow<CardCryptogramException>();
+            action.Should().Throw<CardCryptogramException>();
         }
 
         [TestMethod]

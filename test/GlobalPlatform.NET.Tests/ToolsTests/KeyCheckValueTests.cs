@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using GlobalPlatform.NET.Reference;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace GlobalPlatform.NET.Tests.ToolsTests
 {
@@ -15,7 +15,7 @@ namespace GlobalPlatform.NET.Tests.ToolsTests
 
             var keyCheckValue = Tools.KeyCheckValue.Generate(KeyTypeCoding.DES, keyData);
 
-            keyCheckValue.ShouldAllBeEquivalentTo(new byte[] { 0x8B, 0xAF, 0x47 });
+            keyCheckValue.Should().BeEquivalentTo(new byte[] { 0x8B, 0xAF, 0x47 });
         }
     }
 }
